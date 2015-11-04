@@ -4,6 +4,7 @@ from pybrain.structure import FullConnection
 
 class Predator:
   def __init__(self, direction, x, y):
+    
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
@@ -20,16 +21,33 @@ class Predator:
     self.nn.addConnection(hidden_to_out)
     #initialize NN
     self.nn.sortModules()
+    
     # Energy - dies when reaches 0
     self.energy = 500
+    
     # Which direction it's facing- NSWE
     self.direction = direction
+
     # Location
     self.x = x
     self.y = y
 
-  def metabolism(self):
-    self.energy -= 5
+    # Sees prey
+    self.see_prey = false
+
+    # Age
+    self.age = 0
+
+    # Fertility (reaches fertility at age 100)
+    self.fertility = false
+
+
 
   def update(self):
+    # metabolism
+    self.energy -= 5
+
     
+
+
+
