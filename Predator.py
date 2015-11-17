@@ -2,9 +2,11 @@ from pybrain.structure import FeedForwardNetwork
 from pybrain.structure import LinearLayer, SigmoidLayer
 from pybrain.structure import FullConnection
 
-class Prey:
+class Predator:
+  radius = 20
   def __init__(self, direction, x, y):
-    
+    # # size of predator
+    # self.radius = 20 
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
@@ -32,14 +34,14 @@ class Prey:
     self.x = x
     self.y = y
 
-    # Sees predator
-    self.see_predator = false
+    # Sees prey
+    self.see_prey = False
 
     # Age
     self.age = 0
 
     # Fertility (reaches fertility at age 100)
-    self.fertility = false
+    self.fertility = False
 
 
 
@@ -48,7 +50,7 @@ class Prey:
     self.energy -= 5
     # Aging
     self.age += 1
-    
+
     # Input vector
         # input values are determined by what the animat 
         # is seeing and / or touching
@@ -56,7 +58,6 @@ class Prey:
 
     # Activate the nn
     self.nn.activate(input_vector)
-
     
 
 
