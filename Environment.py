@@ -1,6 +1,7 @@
 import random
 import Predator
 import Prey
+import math
 
 class Environment:
   def __init__ (self, width, height, num_predator, num_prey):
@@ -45,18 +46,96 @@ class Environment:
       return False
     # collision with other predators
     for predator in self.predators:
-      if ( (abs(x - predator.x) < (2 * radius)) and (abs(y - predator.y) < (2 * radius))):
+      if ((abs(x - predator.x) < (2 * radius)) and (abs(y - predator.y) < (2 * radius))):
         return False
     # collision with prey
     for prey in self.preys:
-      if ( (abs(x - prey.x) < (2 * radius)) and (abs(y - prey.y) < (2 * radius))):
+      if ((abs(x - prey.x) < (2 * radius)) and (abs(y - prey.y) < (2 * radius))):
         return False
     # the position is collision free
     return True
 
+  # function to allow predators to sense the world around them
+  # through diffusion of smell
+  # prey that are closer, thus stronger smell, are prioritized
+  def predator_sense_env(self, predator):
+    for prey in self.preys:
+      if ( (abs(predator.x - prey.x) < (4 * radius)) and (abs(predator.y - prey.y) < (4 * radius)) )
+        return (prey.x, prey.y)
+      elif ( (abs(predator.x - prey.x) < (6 * radius)) and (abs(predator.y - prey.y) < (6 * radius)) )
+        return (prey.x, prey.y)
+      elif ( (abs(predator.x - prey.x) < (8 * radius)) and (abs(predator.y - prey.y) < (8 * radius)) )
+        return (prey.x, prey.y)
+      else
+        return None
 
-#define size of Environment
-#define methods to allow animats to see
-#define collision rules when animats run into the border
-#define collision rules for animats running into other animats?
-#initiate and create the animats
+  def predator_is_touching(self, predator):
+    # check to see if the predator is touching another predator
+    for pred in self.predators:
+      if ((abs(predator.x - pred.x) < (2 * Predator.radius)) and (abs(predator.y - pred.y) < (2 * Predator.radius))):
+        return pred
+    # check to see if the predator is touching a prey
+    for prey in self.preys:
+      if ((abs(predator.x - prey.x) < (2 * Predator.radius)) and (abs(predator.y - prey.y) < (2 * Predator.radius))):
+        return prey
+    return self
+
+
+  # function to allow preys to sense the world around them
+  # through diffusion of smell
+  #def prey_sense_env(self, prey):
+
+  def update_environment(self):
+    # update what the predators sense
+    for pred in self.predators:
+      coordinate = predator_sense_env(pred)
+      # if predator senses a prey, change to hunting mode
+      if (coordinate is not None):
+        pred.hunting = True
+        # if predator can reach the prey in one turn, change to caught_prey mode
+        distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.x - coordinate[0])**2 )
+        if (distance_to_prey <= (4.0 * radius)):
+          pred.next_x = coordinate[0]
+          pred.next_y = coordinate[1]
+        else # predator can't reach prey in one turn, so move as close as it can to prey
+          angle = (math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x))
+          inc_x = math.cos(angle) * (4.0 * radius) 
+          inc_y = math.sin(angle) * (4.0 * radius)
+          pred.next_x = pred.x + inc_x
+          pred.next_y = pred.y + inc_y
+
+      else # predator didn't sense any prey around it, change to idle mode
+        pred.hunting = False
+        # move in random direction
+        rand_angle = math.radians(random.randint(0, 360))
+        inc_x = math.cos(rand_angle) * (2.0 * radius)
+        inc_y = math.sin(rand_angle) * (2.0 * radius)
+        # make sure the animat doesn't go out of bounds
+        if (((pred.x + inc_x) < 0 ) or ((pred.x + inc_x) > self.width )):
+          inc_x = inc_x * (-1.0)
+        if (((pred.y + inc_y) < 0 ) or ((pred.y + inc_y) > self.height )):
+          inc_y = inc_y * (-1.0)
+        pred.next_x = pred.x + inc_x
+        pred.next_y = pred.y + inc_y
+      # update pred.contact
+      pred.contact = predator_is_touching(pred)
+      # run predator NN with new inputs
+      pred.update()
+      # predator makes its action in the environment
+      
+
+
+
+
+
+    # update what the prey sense
+
+
+
+
+
+
+
+
+
+

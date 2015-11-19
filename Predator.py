@@ -34,31 +34,81 @@ class Predator:
     self.x = x
     self.y = y
 
-    # Sees prey
-    self.see_prey = False
+    # Sees prey, hunting mode
+    # in hunting mode, predators can move faster, but also consumes more energy
+    # if not in hunting mode, then idle mode
+    self.hunting = False
+
+    # where to move to next
+    self.next_x = 0
+    self.next_y = 0
+
+    # what the predator would come into contact with if moves to next_x, next_y
+    self.contact = None
 
     # Age
     self.age = 0
 
-    # Fertility (reaches fertility at age 100)
+    # Fertility (reaches fertility at age 20)
     self.fertility = False
+
+    # output thresholds for decisions
+    self.move_threshold = 0
+    self.eat_threshold = 0
+
+    # decisions for output
+        # eating a prey gives +250 energy
+    self.move = False
+    self.eat = False
 
 
 
   def update(self):
-    # metabolism
-    self.energy -= 5
+    # metabolism depends on which state the predator is in (hunting or idle)
+    if (self.hunting = True):
+        self.energy -= 50
+    else
+        self.energy -= 25
+
     # Aging
     self.age += 1
 
     # Input vector
         # input values are determined by what the animat 
         # is seeing and / or touching
-    input_vector = []
+    input_vector = (
+                    (1000 * int(isinstance(self.hunting, False))),
+                    (1000 * int(isinstance(self.hunting, True))),
+                    (1000 * int(isinstance(self.contact, Predator))),
+                    (1000 * int(isinstance(self.contact, Prey))),
+                    (1000 * int(isinstance(self.contact, Environment))),
+                    (1000 * self.energy)
+                    )
 
     # Activate the nn
-    self.nn.activate(input_vector)
+    output_vector = self.nn.activate(input_vector)
     
-
-
+    if (output_vector[0] > self.move_threshold):
+        self.move = True
+    if (output_vector[1] > self.eat_threshold):
+        self.eat = True
+    if (self.eat is True):
+        # gains energy if eats the prey
+        if ((isinstance(self.contact, Prey))):
+            if (self.energy >= 250):
+                self.energy = 500
+            else:
+                self.energy += 250
+        # big penalty if try to eat another predator
+        elif ((isinstance(self.contact, Predator))):
+            if (self.energy <= 50):
+                self.energy = 0
+            else:
+                self.energy -= 50
+        # small penalty if try to eat nothing
+        else:
+            if (self.energy <= 25):
+                self.energy = 0
+            else:
+                self.energy -= 25
 

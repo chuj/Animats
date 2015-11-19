@@ -1,6 +1,7 @@
 from pybrain.structure import FeedForwardNetwork
 from pybrain.structure import LinearLayer, SigmoidLayer
 from pybrain.structure import FullConnection
+import math
 
 class Prey:
   radius = 20
