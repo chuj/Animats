@@ -59,21 +59,24 @@ class Environment:
   # through diffusion of smell
   # prey that are closer, thus stronger smell, are prioritized
   def predator_sense_env(self, predator):
+    print "predator coord : %d %d " % (predator.x, predator.y)
     for prey in self.preys:
-      if ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
+      print "prey coord : %d %d " % (prey.x, prey.y)
+      if ( (abs(predator.x - prey.x) < (6 * predator.radius)) and (abs(predator.y - prey.y) < (6 * predator.radius)) ):
         return (prey.x, prey.y)
-      elif ( (abs(predator.x - prey.x) < (12 * predator.radius)) and (abs(predator.y - prey.y) < (12 * predator.radius)) ):
+      elif ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
         return (prey.x, prey.y)
-      elif ( (abs(predator.x - prey.x) < (16 * predator.radius)) and (abs(predator.y - prey.y) < (16 * predator.radius)) ):
+      elif ( (abs(predator.x - prey.x) < (10* predator.radius)) and (abs(predator.y - prey.y) < (10 * predator.radius)) ):
         return (prey.x, prey.y)
       else:
-        return None
+        continue
+    return None
 
   def predator_is_touching(self, predator):
     # check to see if the predator is touching another predator
-    for pred in self.predators:
-      if ((abs(predator.x - pred.x) < (2 * predator.radius)) and (abs(predator.y - pred.y) < (2 * predator.radius))):
-        return pred
+    # for pred in self.predators:
+    #   if ((abs(predator.x - pred.x) < (2 * predator.radius)) and (abs(predator.y - pred.y) < (2 * predator.radius))):
+    #     return pred
     # check to see if the predator is touching a prey
     for prey in self.preys:
       if ((abs(predator.x - prey.x) < (2 * predator.radius)) and (abs(predator.y - prey.y) < (2 * predator.radius))):
@@ -87,17 +90,16 @@ class Environment:
 
   def update_environment(self):
     # update what the predators sense
+    print "-----------------------------"
     for pred in self.predators:
       coordinate = self.predator_sense_env(pred)
-      if (coordinate == None):
-        print "Predator senses nothing"
-      else:
-        print "Predator senses: " + coordinate
       # if predator senses a prey, change to hunting mode
+      print coordinate
       if (coordinate is not None):
+        print "Predator senses: %d %d" % (coordinate[0], coordinate[1])
         pred.hunting = True
         # if predator can reach the prey in one turn, change to caught_prey mode
-        distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.x - coordinate[0])**2 )
+        distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.y - coordinate[1])**2 )
         if (distance_to_prey <= (4.0 * pred.radius)):
           pred.next_x = coordinate[0]
           pred.next_y = coordinate[1]
@@ -110,6 +112,7 @@ class Environment:
           pred.next_y = pred.y + inc_y
 
       else: # predator didn't sense any prey around it, change to idle mode
+        print "Predator senses nothing"
         pred.hunting = False
         # move in random direction
         rand_angle = math.radians(random.randint(0, 360))
@@ -124,14 +127,19 @@ class Environment:
         pred.next_y = pred.y + inc_y
       # update pred.contact
       pred.contact = self.predator_is_touching(pred)
+      print pred.contact
       # run predator NN with new inputs
+      print "pred old energy: %i" % pred.energy
       pred.update()
+      print "pred new energy: %i" % pred.energy
       # predator makes its action in the environment
       if pred.move:
+        print "predator move is true"
         pred.x = pred.next_x
         pred.y = pred.next_y
       if pred.eat: # might have problem here where two predators catch the same prey
         if (isinstance(pred.contact, Prey.Prey)):
+          print "REMOVING PREY"
           self.preys.remove(pred.contact)
         pred.contact = None
 
@@ -139,6 +147,7 @@ class Environment:
     predators_temp = self.predators
     for pred in predators_temp:
       if (pred.energy <= 0):
+        print pred.nn.params
         self.predators.remove(pred)
 
 

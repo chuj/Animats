@@ -21,6 +21,7 @@ class Predator:
     #Add connections
     in_to_hidden = FullConnection(inLayer, hiddenLayer)
     hidden_to_out = FullConnection(hiddenLayer, outLayer)
+
     self.nn.addConnection(in_to_hidden)
     self.nn.addConnection(hidden_to_out)
     #initialize NN
