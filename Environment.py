@@ -60,23 +60,23 @@ class Environment:
   # prey that are closer, thus stronger smell, are prioritized
   def predator_sense_env(self, predator):
     for prey in self.preys:
-      if ( (abs(predator.x - prey.x) < (4 * radius)) and (abs(predator.y - prey.y) < (4 * radius)) )
+      if ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
         return (prey.x, prey.y)
-      elif ( (abs(predator.x - prey.x) < (6 * radius)) and (abs(predator.y - prey.y) < (6 * radius)) )
+      elif ( (abs(predator.x - prey.x) < (12 * predator.radius)) and (abs(predator.y - prey.y) < (12 * predator.radius)) ):
         return (prey.x, prey.y)
-      elif ( (abs(predator.x - prey.x) < (8 * radius)) and (abs(predator.y - prey.y) < (8 * radius)) )
+      elif ( (abs(predator.x - prey.x) < (16 * predator.radius)) and (abs(predator.y - prey.y) < (16 * predator.radius)) ):
         return (prey.x, prey.y)
-      else
+      else:
         return None
 
   def predator_is_touching(self, predator):
     # check to see if the predator is touching another predator
     for pred in self.predators:
-      if ((abs(predator.x - pred.x) < (2 * Predator.radius)) and (abs(predator.y - pred.y) < (2 * Predator.radius))):
+      if ((abs(predator.x - pred.x) < (2 * predator.radius)) and (abs(predator.y - pred.y) < (2 * predator.radius))):
         return pred
     # check to see if the predator is touching a prey
     for prey in self.preys:
-      if ((abs(predator.x - prey.x) < (2 * Predator.radius)) and (abs(predator.y - prey.y) < (2 * Predator.radius))):
+      if ((abs(predator.x - prey.x) < (2 * predator.radius)) and (abs(predator.y - prey.y) < (2 * predator.radius))):
         return prey
     return self
 
@@ -88,28 +88,33 @@ class Environment:
   def update_environment(self):
     # update what the predators sense
     for pred in self.predators:
-      coordinate = predator_sense_env(pred)
+      coordinate = self.predator_sense_env(pred)
+      if (coordinate == None):
+        print "Predator senses nothing"
+      else:
+        print "Predator senses: " + coordinate
       # if predator senses a prey, change to hunting mode
       if (coordinate is not None):
         pred.hunting = True
         # if predator can reach the prey in one turn, change to caught_prey mode
         distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.x - coordinate[0])**2 )
-        if (distance_to_prey <= (4.0 * radius)):
+        if (distance_to_prey <= (4.0 * pred.radius)):
           pred.next_x = coordinate[0]
           pred.next_y = coordinate[1]
-        else # predator can't reach prey in one turn, so move as close as it can to prey
+        else: 
+        # predator can't reach prey in one turn, so move as close as it can to prey
           angle = (math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x))
-          inc_x = math.cos(angle) * (4.0 * radius) 
-          inc_y = math.sin(angle) * (4.0 * radius)
+          inc_x = math.cos(angle) * (4.0 * pred.radius) 
+          inc_y = math.sin(angle) * (4.0 * pred.radius)
           pred.next_x = pred.x + inc_x
           pred.next_y = pred.y + inc_y
 
-      else # predator didn't sense any prey around it, change to idle mode
+      else: # predator didn't sense any prey around it, change to idle mode
         pred.hunting = False
         # move in random direction
         rand_angle = math.radians(random.randint(0, 360))
-        inc_x = math.cos(rand_angle) * (2.0 * radius)
-        inc_y = math.sin(rand_angle) * (2.0 * radius)
+        inc_x = math.cos(rand_angle) * (2.0 * pred.radius)
+        inc_y = math.sin(rand_angle) * (2.0 * pred.radius)
         # make sure the animat doesn't go out of bounds
         if (((pred.x + inc_x) < 0 ) or ((pred.x + inc_x) > self.width )):
           inc_x = inc_x * (-1.0)
@@ -118,11 +123,23 @@ class Environment:
         pred.next_x = pred.x + inc_x
         pred.next_y = pred.y + inc_y
       # update pred.contact
-      pred.contact = predator_is_touching(pred)
+      pred.contact = self.predator_is_touching(pred)
       # run predator NN with new inputs
       pred.update()
       # predator makes its action in the environment
-      
+      if pred.move:
+        pred.x = pred.next_x
+        pred.y = pred.next_y
+      if pred.eat: # might have problem here where two predators catch the same prey
+        if (isinstance(pred.contact, Prey.Prey)):
+          self.preys.remove(pred.contact)
+        pred.contact = None
+
+    # remove dead predators from the environment
+    predators_temp = self.predators
+    for pred in predators_temp:
+      if (pred.energy <= 0):
+        self.predators.remove(pred)
 
 
 

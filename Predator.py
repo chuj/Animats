@@ -1,6 +1,8 @@
 from pybrain.structure import FeedForwardNetwork
 from pybrain.structure import LinearLayer, SigmoidLayer
 from pybrain.structure import FullConnection
+import Prey
+import Environment
 
 class Predator:
   radius = 20
@@ -10,9 +12,9 @@ class Predator:
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(12)
-    hiddenLayer = SigmoidLayer(13)
-    outLayer = LinearLayer(6)
+    inLayer = LinearLayer(5)
+    hiddenLayer = SigmoidLayer(6)
+    outLayer = LinearLayer(2)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
     self.nn.addOutputModule(outLayer)
@@ -61,13 +63,17 @@ class Predator:
     self.move = False
     self.eat = False
 
-
-
   def update(self):
     # metabolism depends on which state the predator is in (hunting or idle)
-    if (self.hunting = True):
+    if (self.hunting is True):
+      if (self.energy < 50):
+        self.energy = 0
+      else:
         self.energy -= 50
-    else
+    else:
+      if (self.energy < 25):
+        self.energy = 0
+      else:
         self.energy -= 25
 
     # Aging
@@ -77,12 +83,11 @@ class Predator:
         # input values are determined by what the animat 
         # is seeing and / or touching
     input_vector = (
-                    (1000 * int(isinstance(self.hunting, False))),
-                    (1000 * int(isinstance(self.hunting, True))),
-                    (1000 * int(isinstance(self.contact, Predator))),
-                    (1000 * int(isinstance(self.contact, Prey))),
-                    (1000 * int(isinstance(self.contact, Environment))),
-                    (1000 * self.energy)
+                    (2000 * int(self.hunting)),
+                    (2000 * int(isinstance(self.contact, Predator))),
+                    (2000 * int(isinstance(self.contact, Prey.Prey))),
+                    (2000 * int(isinstance(self.contact, Environment.Environment))),
+                    (2000 * self.energy)
                     )
 
     # Activate the nn
@@ -94,7 +99,7 @@ class Predator:
         self.eat = True
     if (self.eat is True):
         # gains energy if eats the prey
-        if ((isinstance(self.contact, Prey))):
+        if ((isinstance(self.contact, Prey.Prey))):
             if (self.energy >= 250):
                 self.energy = 500
             else:
@@ -111,4 +116,6 @@ class Predator:
                 self.energy = 0
             else:
                 self.energy -= 25
+
+
 
