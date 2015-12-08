@@ -5,7 +5,7 @@ import Prey
 import Environment
 
 class Predator:
-  radius = 20
+  radius = 5
   def __init__(self, direction, x, y):
     # # size of predator
     # self.radius = 20 
@@ -49,11 +49,11 @@ class Predator:
     # what the predator would come into contact with if moves to next_x, next_y
     self.contact = None
 
-    # Age
+    # Age, reaches maturity at age 50
     self.age = 0
 
-    # Fertility (reaches fertility at age 20)
-    self.fertility = False
+    # has it mated and reproduced yet?
+    self.not_mated = True
 
     # output thresholds for decisions
     self.move_threshold = 0

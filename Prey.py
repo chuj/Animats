@@ -4,7 +4,7 @@ from pybrain.structure import FullConnection
 import math
 
 class Prey:
-  radius = 20
+  radius = 5
   def __init__(self, direction, x, y):
     # #size of prey
     # self.radius = 20
