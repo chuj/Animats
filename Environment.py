@@ -99,6 +99,8 @@ class Environment:
     while (len(self.mature_predators) >= 2):
       parent1 = self.mature_predators.pop(0)
       parent2 = self.mature_predators.pop(0)
+      parent1.not_mated = False
+      parent2.not_mated = False
       # reproduce 2 - 4 offspring
       num_offspring = random.randint(1,4)
       for x in xrange(num_offspring):
@@ -174,17 +176,17 @@ class Environment:
           new_prey = Prey.Prey(random.random() * 360, location[0], location[1])
           self.preys.append(new_prey)
         pred.contact = None
-      if (pred.age >= 50 and pred.not_mated):
+      if (pred.age >= 15 and pred.not_mated):
         self.mature_predators.append(pred)
-      # pred dies at age 75
-      if (pred.age >= 75):
+      # pred dies at age 30
+      if (pred.age >= 30):
         pred.energy = 0
 
     # remove dead predators from the environment
     predators_temp = self.predators
     for pred in predators_temp:
       if (pred.energy <= 0):
-        print pred.nn.params
+        # print pred.nn.params
         self.predators.remove(pred)
         self.num_predator -= 1
         print "a predator died!"
