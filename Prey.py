@@ -11,9 +11,9 @@ class Prey:
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(12)
-    hiddenLayer = SigmoidLayer(13)
-    outLayer = LinearLayer(6)
+    inLayer = LinearLayer(3)
+    hiddenLayer = SigmoidLayer(4)
+    outLayer = LinearLayer(2)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
     self.nn.addOutputModule(outLayer)
@@ -35,32 +35,77 @@ class Prey:
     self.x = x
     self.y = y
 
-    # Sees predator
-    self.see_predator = False
+    # Senses predator
+    self.senses_predator = False
+
+    # where to move to next to escape from predator
+    self.escape_x = 0
+    self.escape_y = 0
+
+    # where to move to next if no food or predator, random movement
+    self.next_x = 0
+    self.next_y = 0
+
+    # eat or not (eating regains energy)
+    self.want_to_eat = False
+
+    # move or not
+    self.want_to_move = False
+
+    # if energy is less than 100, gets hungry status
+    self.is_hungry = False
 
     # Age
     self.age = 0
 
-    # Fertility (reaches fertility at age 100)
-    self.fertility = False
+    # output thresholds for decisions
+    self.move_threshold = 0
+    self.eat_threshold = 0
 
-
+    # has it mated and reproduced yet?
+    self.not_mated = True
 
   def update(self):
-    # metabolism
-    self.energy -= 5
+    # metabolism depends on which state the prey is in (escaping from predator, idle)
+    if (self.senses_predator is True):
+      if (self.energy < 50):
+        self.energy = 0
+      else:
+        self.energy -= 50
+    else: # idle mode, consumes less energy
+      if (self.energy < 25):
+        self.energy = 0
+      else:
+        self.energy -= 25
+
+    if (self.energy < 100):
+      self.is_hungry = True
+    
     # Aging
     self.age += 1
     
     # Input vector
         # input values are determined by what the animat 
         # is seeing and / or touching
-    input_vector = []
+    input_vector = (
+                    (2000 * int(self.senses_predator)),
+                    (2000 * self.energy),
+                    (2000 * self.is_hungry)
+                    )
 
     # Activate the nn
-    self.nn.activate(input_vector)
+    output_vector = self.nn.activate(input_vector)
 
-    
+    if (output_vector[0] > self.move_threshold):
+      self.want_to_move = True
+    if (output_vector[1] > self.eat_threshold):
+      self.want_to_eat = True
+    if (self.want_to_eat):
+      if (self.energy >= 400):
+        self.energy = 500
+      else:
+        self.energy += 100
+      self.is_hungry = False
 
 
 

@@ -91,10 +91,19 @@ class Environment:
 
   # function to allow preys to sense the world around them
   # through diffusion of smell
-  #def prey_sense_env(self, prey):
+  def prey_sense_pred(self, prey):
+    for pred in self.predators:
+      if ( (abs(prey.x - pred.x) < (6 * prey.radius)) and (abs(prey.y - pred.y) < (6 * prey.radius)) ):
+        return (pred.x, pred.y)
+      elif ( (abs(prey.x - pred.x) < (8 * prey.radius)) and (abs(prey.y - pred.y) < (8 * prey.radius)) ):
+        return (pred.x, pred.y)
+      elif ( (abs(prey.x - pred.x) < (10 * prey.radius)) and (abs(prey.y - pred.y) < (10 * prey.radius)) ):
+        return (pred.x, pred.y)
+      else:
+        continue
+    return None
 
   def update_environment(self):
-
     # check to see if any predators can mate
     while (len(self.mature_predators) >= 2):
       parent1 = self.mature_predators.pop(0)
@@ -191,14 +200,88 @@ class Environment:
         self.num_predator -= 1
         print "a predator died!"
 
-
-
+    # check to see if any preys can mate
+    while (len(self.mature_preys) >= 2):
+      parent1 = self.mature_preys.pop(0)
+      parent2 = self.mature_preys.pop(0)
+      parent1.not_mated = False
+      parent2.not_mated = False
+      # reproduce 2 - 4 offspring
+      num_offspring = random.randint(1,4)
+      for x in xrange(num_offspring):
+        offspring_location = self.findEmptySpace(Prey.Prey.radius)
+        offspring = Prey.Prey(random.random() * 360, offspring_location[0], offspring_location[1])
+        # genetic recombination of parent's genotype
+        for i in xrange(len(parent1.nn.params)):
+          # 90% chance for each weight to be inherited from p1 or p2
+          # 10% chance mutation where weight will be random
+          if (random.randint(1,10) < 9):
+            if (random.randint(0,1) > 0):
+              offspring.nn.params[i] = parent1.nn.params[i]
+            else:
+              offspring.nn.params[i] = parent2.nn.params[i]
+        self.preys.append(offspring)
+        self.num_prey += 1
 
 
     # update what the prey sense
+    for prey in self.preys:
+      # if prey senses a predator, change to escape mode
+      pred_coord = self.prey_sense_pred(prey)
+      if (pred_coord is not None):
+        prey.senses_predator = True
+        angle_escape = (math.atan2(pred_coord[1] - prey.y, pred_coord[0] - prey.x))
+        inc_x_escape = math.cos(angle_escape) * (3.0 * prey.radius) 
+        inc_y_escape = math.sin(angle_escape) * (3.0 * prey.radius)
+        # make sure the prey doesn't go out of bounds
+        if (((prey.x + inc_x_escape) < 0 ) or ((prey.x + inc_x_escape) > self.width )):
+          inc_x_escape = inc_x_escape * (-1.0)
+        if (((prey.y + inc_y_escape) < 0 ) or ((prey.y + inc_y_escape) > self.height )):
+          inc_y_escape = inc_y_escape * (-1.0)
+        prey.escape_x = prey.x + inc_x_escape
+        prey.escape_y = prey.y + inc_y_escape
+      else:
+        # prey did not sense any predators
+        prey.senses_predator = False
+        # move in random direction
+        rand_angle = math.radians(random.randint(0, 360))
+        inc_x_rand = math.cos(rand_angle) * (2.0 * prey.radius)
+        inc_y_rand = math.sin(rand_angle) * (2.0 * prey.radius)
+        # make sure the animat doesn't go out of bounds
+        if (((prey.x + inc_x_rand) < 0 ) or ((prey.x + inc_x_rand) > self.width )):
+          inc_x_rand = inc_x_rand * (-1.0)
+        if (((prey.y + inc_y_rand) < 0 ) or ((prey.y + inc_y_rand) > self.height )):
+          inc_y_rand = inc_y_rand * (-1.0)
+        prey.next_x = prey.x + inc_x_rand
+        prey.next_y = prey.y + inc_y_rand
 
+      # run prey NN with new inputs
+      prey.update()
+      if (prey.want_to_eat):
+        # prey doesn't move when eating, stays still
+        prey.next_x = prey.x
+        prey.next_y = prey.y
+        prey.escape_x = prey.x
+        prey.escape_y = prey.y
+      if (prey.want_to_move):
+        if (prey.senses_predator):
+          prey.x = prey.escape_x
+          prey.y = prey.escape_y
+        else:
+          prey.x = prey.next_x
+          prey.y = prey.next_y
+      if (prey.age >= 30 and prey.not_mated):
+        self.mature_preys.append(prey)
+      # prey dies at age 30
+      if (prey.age >= 50):
+        prey.energy = 0
 
-
+    # remove dead prey from the environment
+    preys_temp = self.preys
+    for prey in preys_temp:
+      if (prey.energy <= 0):
+        self.preys.remove(prey)
+        self.num_prey -= 1
 
 
 
