@@ -2,9 +2,13 @@ import random
 import Predator
 import Prey
 import math
+import logging
 
 class Environment:
   def __init__ (self, width, height, num_predator, num_prey):
+    # logging
+    filename = "simulation.log"
+    logging.basicConfig(filename = filename, level = logging.DEBUG)
     #array to hold predator and prey objs
     self.predators = []
     self.preys = []
@@ -64,9 +68,7 @@ class Environment:
   # through diffusion of smell
   # prey that are closer, thus stronger smell, are prioritized
   def predator_sense_env(self, predator):
-    # print "predator coord : %d %d " % (predator.x, predator.y)
     for prey in self.preys:
-      # print "prey coord : %d %d " % (prey.x, prey.y)
       if ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
         return (prey.x, prey.y)
       elif ( (abs(predator.x - prey.x) < (10 * predator.radius)) and (abs(predator.y - prey.y) < (10 * predator.radius)) ):
@@ -111,7 +113,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1,4)
+      num_offspring = random.randint(2 ,4)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Predator.Predator.radius)
         offspring = Predator.Predator(random.random() * 360, offspring_location[0], offspring_location[1])
@@ -125,17 +127,14 @@ class Environment:
             else:
               offspring.nn.params[i] = parent2.nn.params[i]
         self.predators.append(offspring)
-        print "New pred offspring!"
+        # print "New pred offspring!"
         self.num_predator += 1
 
     # update what the predators sense
-    print "-----------------------------"
     for pred in self.predators:
       coordinate = self.predator_sense_env(pred)
       # if predator senses a prey, change to hunting mode
-      # print coordinate
       if (coordinate is not None):
-        # print "Predator senses: %d %d" % (coordinate[0], coordinate[1])
         pred.hunting = True
         # if predator can reach the prey in one turn, change to caught_prey mode
         distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.y - coordinate[1])**2 )
@@ -166,21 +165,15 @@ class Environment:
         pred.next_y = pred.y + inc_y
       # update pred.contact
       pred.contact = self.predator_is_touching(pred)
-      # print pred.contact
       # run predator NN with new inputs
-      # print "pred old energy: %i" % pred.energy
       pred.update()
-      # print "pred new energy: %i" % pred.energy
       # predator makes its action in the environment
       if pred.move:
-        # print "predator move is true"
         pred.x = pred.next_x
         pred.y = pred.next_y
-      if pred.eat: # might have problem here where two predators catch the same prey
+      if pred.eat: 
         if (isinstance(pred.contact, Prey.Prey)):
-          print "REMOVING PREY"
           self.preys.remove(pred.contact)
-          # temp code: if a prey gets eaten, respawn a new one in a random location
           location = self.findEmptySpace(Prey.Prey.radius)
           new_prey = Prey.Prey(random.random() * 360, location[0], location[1])
           self.preys.append(new_prey)
@@ -195,10 +188,8 @@ class Environment:
     predators_temp = self.predators
     for pred in predators_temp:
       if (pred.energy <= 0):
-        # print pred.nn.params
         self.predators.remove(pred)
         self.num_predator -= 1
-        print "a predator died!"
 
     # check to see if any preys can mate
     while (len(self.mature_preys) >= 2):
@@ -207,7 +198,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1,4)
+      num_offspring = random.randint(1,2)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Prey.Prey.radius)
         offspring = Prey.Prey(random.random() * 360, offspring_location[0], offspring_location[1])
@@ -282,6 +273,9 @@ class Environment:
       if (prey.energy <= 0):
         self.preys.remove(prey)
         self.num_prey -= 1
+
+    # log the number of predator and prey after this iteration
+    logging.info("Num Pred:%d         Num Prey:%d" % (self.num_predator, self.num_prey))
 
 
 

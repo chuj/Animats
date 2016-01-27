@@ -53,10 +53,10 @@ if __name__ == "__main__":
     view.surface.blit(view.prey_image, (prey.x - prey.radius, prey.y - prey.radius))
   pygame.display.flip()
   # time.sleep(2)
-  for i in range(10):
+  for i in range(60):
     view.update(10)
     pygame.display.flip()
-    time.sleep(0.5)
+    # time.sleep(0.5)
   print "Predators left : %d" % view.environment.num_predator
   print "Preys left : %d" % view.environment.num_prey
   pygame.quit()

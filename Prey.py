@@ -6,8 +6,6 @@ import math
 class Prey:
   radius = 5
   def __init__(self, direction, x, y):
-    # #size of prey
-    # self.radius = 20
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
@@ -27,9 +25,6 @@ class Prey:
     
     # Energy - dies when reaches 0
     self.energy = 500
-    
-    # Which direction it's facing- NSWE
-    self.direction = direction
 
     # Location
     self.x = x
