@@ -80,14 +80,14 @@ class Environment:
         continue
     return None
 
-  def predator_is_touching(self, predator):
+  def predator_will_touch(self, predator):
     # check to see if the predator is touching another predator
     # for pred in self.predators:
     #   if ((abs(predator.x - pred.x) < (2 * predator.radius)) and (abs(predator.y - pred.y) < (2 * predator.radius))):
     #     return pred
     # check to see if the predator is touching a prey
     for prey in self.preys:
-      if ((abs(predator.x - prey.x) < (2 * predator.radius)) and (abs(predator.y - prey.y) < (2 * predator.radius))):
+      if ((abs(predator.next_x - prey.x) < (2 * predator.radius)) and (abs(predator.next_y - prey.y) < (2 * predator.radius))):
         return prey
     return self
 
@@ -131,7 +131,7 @@ class Environment:
         # print "New pred offspring!"
         self.num_predator += 1
 
-    # update what the predators sense
+    # UPDATE what the predators sense
     for pred in self.predators:
       coordinate = self.predator_sense_env(pred)
       # if predator senses a prey, change to hunting mode
@@ -143,26 +143,50 @@ class Environment:
         # if predator can reach the prey in one turn
         # TODO: CHANGE THIS PART
         #check each pred step to see if it touches the prey
-        
+        # for loop going from steps 1 2 3
+          #check each step to see if collision with prey
+            #if collision, then move to that step
+            # return
+        # ADJUST these values for the for loop later
+        for i in xrange(1, 3, 1):
+          inc_x = math.cos(pred.direction) * (1 * pred.radius)
+          inc_y = math.sin(pred.direction) * (1 * pred.radius)
+          # make sure the pred doesn't go out of bounds
+          if (((pred.next_x + inc_x) < 0 ) or ((pred.next_x + inc_x) > self.width )):
+            inc_x = inc_x * (-1.0)
+          if (((pred.next_y + inc_y) < 0 ) or ((pred.next_y + inc_y) > self.height )):
+            inc_y = inc_y * (-1.0)
+          pred.next_x += inc_x
+          pred.next_y += inc_y
+          pred.contact = self.predator_will_touch(pred)
+          if (isinstance(pred.contact, Prey.Prey)):
+            return
+
+########## OLD CODE
+
         # distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.y - coordinate[1])**2 )
         # if (distance_to_prey <= (4.0 * pred.radius)):
         #   pred.next_x = coordinate[0]
         #   pred.next_y = coordinate[1]
-        else: 
-        # predator can't reach prey in one turn, so move as close as it can to prey
-          angle = (math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x))
-          inc_x = math.cos(angle) * (4.0 * pred.radius) 
-          inc_y = math.sin(angle) * (4.0 * pred.radius)
-          pred.next_x = pred.x + inc_x
-          pred.next_y = pred.y + inc_y
+        # else: 
+        # # predator can't reach prey in one turn, so move as close as it can to prey
+        #   angle = (math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x))
+        #   inc_x = math.cos(angle) * (4.0 * pred.radius) 
+        #   inc_y = math.sin(angle) * (4.0 * pred.radius)
+        #   pred.next_x = pred.x + inc_x
+        #   pred.next_y = pred.y + inc_y
+
+#####################
 
       else: # predator didn't sense any prey around it, change to idle mode
         # print "Predator senses nothing"
         pred.hunting = False
-        # move in random direction
-        rand_angle = math.radians(random.randint(0, 360))
-        inc_x = math.cos(rand_angle) * (2.0 * pred.radius)
-        inc_y = math.sin(rand_angle) * (2.0 * pred.radius)
+        # no prey, so give a random angle
+        pred.prey_direction = math.radians(random.randint(0, 359))
+        # no prey, randomly decides how much to move      
+        inc_x = math.cos(pred.direction) * ((random.randint(1, 2)) * pred.radius)
+        inc_y = math.sin(pred.direction) * ((random.randint(1, 2)) * pred.radius)
+
         # make sure the animat doesn't go out of bounds
         if (((pred.x + inc_x) < 0 ) or ((pred.x + inc_x) > self.width )):
           inc_x = inc_x * (-1.0)
@@ -171,7 +195,9 @@ class Environment:
         pred.next_x = pred.x + inc_x
         pred.next_y = pred.y + inc_y
       # update pred.contact
-      pred.contact = self.predator_is_touching(pred)
+      pred.contact = self.predator_will_touch(pred)
+      
+
       # run predator NN with new inputs
       pred.update()
       # predator makes its action in the environment
