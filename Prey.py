@@ -36,6 +36,9 @@ class Prey:
     # Senses predator
     self.senses_predator = False
 
+    # predator's general direction
+    self.pred_direction = 0
+
     # where to move to next to escape from predator
     self.escape_x = 0
     self.escape_y = 0

@@ -141,12 +141,12 @@ class Environment:
 
     # UPDATE what the predators sense
     for pred in self.predators:
-      coordinate = self.predator_sense_prey(pred)
+      prey_coordinate = self.predator_sense_prey(pred)
       # if predator senses a prey, change to hunting mode
-      if (coordinate is not None):
+      if (prey_coordinate is not None):
         pred.hunting = True
         # give the predator a general direction of where prey is
-        pred.prey_direction = math.ceil(math.degrees(math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x)))
+        pred.prey_direction = math.ceil(math.degrees(math.atan2(prey_coordinate[1] - pred.y, prey_coordinate[0] - pred.x)))
 
         # if predator can reach the prey in one turn
         # TODO: CHANGE THIS PART
@@ -172,13 +172,13 @@ class Environment:
 
 ########## OLD CODE
 
-        # distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.y - coordinate[1])**2 )
+        # distance_to_prey = math.sqrt((pred.x - prey_coordinate[0])**2 + (pred.y - prey_coordinate[1])**2 )
         # if (distance_to_prey <= (4.0 * pred.radius)):
-        #   pred.next_x = coordinate[0]
-        #   pred.next_y = coordinate[1]
+        #   pred.next_x = prey_coordinate[0]
+        #   pred.next_y = prey_coordinate[1]
         # else: 
         # # predator can't reach prey in one turn, so move as close as it can to prey
-        #   angle = (math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x))
+        #   angle = (math.atan2(prey_coordinate[1] - pred.y, prey_coordinate[0] - pred.x))
         #   inc_x = math.cos(angle) * (4.0 * pred.radius) 
         #   inc_y = math.sin(angle) * (4.0 * pred.radius)
         #   pred.next_x = pred.x + inc_x
@@ -200,11 +200,17 @@ class Environment:
           inc_x = inc_x * (-1.0)
         if (((pred.y + inc_y) < 0 ) or ((pred.y + inc_y) > self.height )):
           inc_y = inc_y * (-1.0)
-        pred.next_x = pred.x + inc_x
-        pred.next_y = pred.y + inc_y
+        pred.next_x += inc_x
+        pred.next_y += inc_y
       # update pred.contact
       pred.contact = self.predator_will_touch(pred)
       
+      # check to see if predator senses another pred
+      pred_coordinate = self.predator_sense_pred(pred)
+      if (pred_coordinate is not None):
+        # if another predator is sensed, give our pred the general direction
+        pred.pred_direction = math.ceil(math.degrees(math.atan2(pred_coordinate[1] - pred.y, pred_coordinate[0] - pred.x)))
+
 
       # run predator NN with new inputs
       pred.update()
@@ -255,7 +261,7 @@ class Environment:
         self.preys.append(offspring)
         self.num_prey += 1
 
-
+    # TODO: modify how prey sense and update themselves with direction
     # update what the prey sense
     for prey in self.preys:
       # if prey senses a predator, change to escape mode
@@ -317,10 +323,4 @@ class Environment:
 
     # log the number of predator and prey after this iteration
     logging.info("Num Pred:%d         Num Prey:%d" % (self.num_predator, self.num_prey))
-
-
-
-
-
-
 

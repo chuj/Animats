@@ -38,6 +38,9 @@ class Predator:
     # prey's direction. general direction to where prey is
     self.prey_direction = 0
 
+    # other predator's direction. general direction to where the predator is
+    self.pred_direction = 0
+
     # Sees prey, hunting mode
     # in hunting mode, predators can move faster, but also consumes more energy
     # if not in hunting mode, then idle mode
@@ -91,7 +94,8 @@ class Predator:
                     (2000 * int(isinstance(self.contact, Environment.Environment))),
                     (2000 * self.energy),
                     (2000 * self.direction),
-                    (2000 * self.prey_direction)
+                    (2000 * self.prey_direction),
+                    (2000 * self.pred_direction)
                     # TODO: add direction of other predator
                     )
 
