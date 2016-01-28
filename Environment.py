@@ -68,7 +68,7 @@ class Environment:
   # through diffusion of smell
   # prey that are closer, thus stronger smell, are prioritized
   # also returns the direction the prey is facing
-  def predator_sense_env(self, predator):
+  def predator_sense_prey(self, predator):
     for prey in self.preys:
       if ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
         return (prey.x, prey.y)
@@ -80,17 +80,25 @@ class Environment:
         continue
     return None
 
+  # TODO: modify the steps here
+  def predator_sense_pred(self, predator):
+    for pred in self.predators:
+      if ( (abs(predator.x - pred.x) < (8 * predator.radius)) and (abs(predator.y - pred.y) < (8 * predator.radius)) ):
+        return (pred.x, pred.y)
+      elif ( (abs(predator.x - pred.x) < (10 * predator.radius)) and (abs(predator.y - pred.y) < (10 * predator.radius)) ):
+        return (pred.x, pred.y)
+      elif ( (abs(predator.x - pred.x) < (12 * predator.radius)) and (abs(predator.y - pred.y) < (12 * predator.radius)) ):
+        return (pred.x, pred.y)
+      else:
+        continue
+    return None
+
   def predator_will_touch(self, predator):
-    # check to see if the predator is touching another predator
-    # for pred in self.predators:
-    #   if ((abs(predator.x - pred.x) < (2 * predator.radius)) and (abs(predator.y - pred.y) < (2 * predator.radius))):
-    #     return pred
     # check to see if the predator is touching a prey
     for prey in self.preys:
       if ((abs(predator.next_x - prey.x) < (2 * predator.radius)) and (abs(predator.next_y - prey.y) < (2 * predator.radius))):
         return prey
     return self
-
 
   # function to allow preys to sense the world around them
   # through diffusion of smell
@@ -133,7 +141,7 @@ class Environment:
 
     # UPDATE what the predators sense
     for pred in self.predators:
-      coordinate = self.predator_sense_env(pred)
+      coordinate = self.predator_sense_prey(pred)
       # if predator senses a prey, change to hunting mode
       if (coordinate is not None):
         pred.hunting = True
