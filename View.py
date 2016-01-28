@@ -15,8 +15,8 @@ class View:
     self.surface = pygame.display.set_mode((width,height))
 
     # load pictures for predator and Prey
-    self.predator = pygame.image.load("predator.png")
-    self.prey = pygame.image.load("prey.png")
+    self.predator = pygame.image.load("predator_direction.png")
+    self.prey = pygame.image.load("prey_direction.png")
     self.background = pygame.image.load("background.jpg")
 
     # transform the image sizes to fit
@@ -37,9 +37,9 @@ class View:
     view.surface.blit(view.background, (0,0))
     # repaint the animats
     for predator in view.environment.predators:
-      view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
+      view.surface.blit( pygame.transform.rotate(view.predator_image, 360 - predator.direction) , (predator.x - predator.radius, predator.y - predator.radius))
     for prey in view.environment.preys:
-      view.surface.blit(view.prey_image, (prey.x - prey.radius, prey.y - prey.radius))
+      view.surface.blit( pygame.transform.rotate(view.prey_image, 360 - prey.direction), (prey.x - prey.radius, prey.y - prey.radius))
 
 
 

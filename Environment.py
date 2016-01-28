@@ -67,13 +67,14 @@ class Environment:
   # function to allow predators to sense the world around them
   # through diffusion of smell
   # prey that are closer, thus stronger smell, are prioritized
+  # also returns the direction the prey is facing
   def predator_sense_env(self, predator):
     for prey in self.preys:
       if ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
         return (prey.x, prey.y)
       elif ( (abs(predator.x - prey.x) < (10 * predator.radius)) and (abs(predator.y - prey.y) < (10 * predator.radius)) ):
         return (prey.x, prey.y)
-      elif ( (abs(predator.x - prey.x) < (12* predator.radius)) and (abs(predator.y - prey.y) < (12 * predator.radius)) ):
+      elif ( (abs(predator.x - prey.x) < (12 * predator.radius)) and (abs(predator.y - prey.y) < (12 * predator.radius)) ):
         return (prey.x, prey.y)
       else:
         continue
@@ -136,11 +137,17 @@ class Environment:
       # if predator senses a prey, change to hunting mode
       if (coordinate is not None):
         pred.hunting = True
-        # if predator can reach the prey in one turn, change to caught_prey mode
-        distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.y - coordinate[1])**2 )
-        if (distance_to_prey <= (4.0 * pred.radius)):
-          pred.next_x = coordinate[0]
-          pred.next_y = coordinate[1]
+        # give the predator a general direction of where prey is
+        pred.prey_direction = math.ceil(math.degrees(math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x)))
+
+        # if predator can reach the prey in one turn
+        # TODO: CHANGE THIS PART
+        #check each pred step to see if it touches the prey
+        
+        # distance_to_prey = math.sqrt((pred.x - coordinate[0])**2 + (pred.y - coordinate[1])**2 )
+        # if (distance_to_prey <= (4.0 * pred.radius)):
+        #   pred.next_x = coordinate[0]
+        #   pred.next_y = coordinate[1]
         else: 
         # predator can't reach prey in one turn, so move as close as it can to prey
           angle = (math.atan2(coordinate[1] - pred.y, coordinate[0] - pred.x))

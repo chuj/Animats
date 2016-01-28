@@ -30,6 +30,9 @@ class Prey:
     self.x = x
     self.y = y
 
+    # direction / angle
+    self.direction = direction
+
     # Senses predator
     self.senses_predator = False
 

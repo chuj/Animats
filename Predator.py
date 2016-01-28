@@ -32,6 +32,12 @@ class Predator:
     self.x = x
     self.y = y
 
+    # direction / angle
+    self.direction = direction
+
+    # prey's direction. general direction to where prey is
+    self.prey_direction = 0
+
     # Sees prey, hunting mode
     # in hunting mode, predators can move faster, but also consumes more energy
     # if not in hunting mode, then idle mode
@@ -79,11 +85,14 @@ class Predator:
         # input values are determined by what the animat 
         # is seeing and / or touching
     input_vector = (
-                    (2000 * int(self.hunting)),
+                    (2000 * int(self.hunting)), # remove hunting mode?
                     (2000 * int(isinstance(self.contact, Predator))),
                     (2000 * int(isinstance(self.contact, Prey.Prey))),
                     (2000 * int(isinstance(self.contact, Environment.Environment))),
-                    (2000 * self.energy)
+                    (2000 * self.energy),
+                    (2000 * self.direction),
+                    (2000 * self.prey_direction)
+                    # TODO: add direction of other predator
                     )
 
     # Activate the nn
