@@ -47,8 +47,8 @@ class Predator:
     self.hunting = False
 
     # where to move to next
-    self.next_x = 0
-    self.next_y = 0
+    self.next_x = x
+    self.next_y = y
 
     # what the predator would come into contact with if moves to next_x, next_y
     self.contact = None
@@ -96,35 +96,42 @@ class Predator:
                     (2000 * self.direction),
                     (2000 * self.prey_direction),
                     (2000 * self.pred_direction)
-                    # TODO: add direction of other predator
                     )
 
     # Activate the nn
     output_vector = self.nn.activate(input_vector)
     
+    # move
     if (output_vector[0] > self.move_threshold):
-        self.move = True
+      self.move = True
+    # eat
     if (output_vector[1] > self.eat_threshold):
-        self.eat = True
+      self.eat = True
+
+    # direction: turn right (clockwise)
+    self.direction -= output_vector[2]
+    #direction: turn left (counter clockwise)
+    self.direction += output_vector[3]
+
     if (self.eat is True):
-        # gains energy if eats the prey
-        if ((isinstance(self.contact, Prey.Prey))):
-            if (self.energy >= 250):
-                self.energy = 500
-            else:
-                self.energy += 250
-        # big penalty if try to eat another predator
-        elif ((isinstance(self.contact, Predator))):
-            if (self.energy <= 50):
-                self.energy = 0
-            else:
-                self.energy -= 50
-        # small penalty if try to eat nothing
+      # gains energy if eats the prey
+      if ((isinstance(self.contact, Prey.Prey))):
+        if (self.energy >= 250):
+          self.energy = 500
         else:
-            if (self.energy <= 25):
-                self.energy = 0
-            else:
-                self.energy -= 25
+          self.energy += 250
+        # big penalty if try to eat another predator
+      elif ((isinstance(self.contact, Predator))):
+        if (self.energy <= 50):
+            self.energy = 0
+        else:
+            self.energy -= 50
+    # small penalty if try to eat nothing
+    else:
+        if (self.energy <= 25):
+            self.energy = 0
+        else:
+            self.energy -= 25
 
 
 

@@ -39,13 +39,9 @@ class Prey:
     # predator's general direction
     self.pred_direction = 0
 
-    # where to move to next to escape from predator
-    self.escape_x = 0
-    self.escape_y = 0
-
-    # where to move to next if no food or predator, random movement
-    self.next_x = 0
-    self.next_y = 0
+    # where to move to next
+    self.next_x = x
+    self.next_y = y
 
     # eat or not (eating regains energy)
     self.want_to_eat = False
@@ -91,16 +87,24 @@ class Prey:
     input_vector = (
                     (2000 * int(self.senses_predator)),
                     (2000 * self.energy),
-                    (2000 * self.is_hungry)
+                    (2000 * self.is_hungry),
+                    (2000 * self.direction),
+                    (2000 * self.pred_direction)
                     )
 
     # Activate the nn
     output_vector = self.nn.activate(input_vector)
-
+    # move
     if (output_vector[0] > self.move_threshold):
       self.want_to_move = True
+    # eat
     if (output_vector[1] > self.eat_threshold):
       self.want_to_eat = True
+    # direction: turn right (clockwise)
+    self.direction -= output_vector[2]
+    #direction: turn left (counter clockwise)
+    self.direction += output_vector[3]
+    
     if (self.want_to_eat):
       if (self.energy >= 400):
         self.energy = 500

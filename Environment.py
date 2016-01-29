@@ -27,12 +27,12 @@ class Environment:
     #initialize predators
     for z in range(0, num_predator):
       location = self.findEmptySpace(Predator.Predator.radius)
-      new_pred = Predator.Predator(random.random() * 360, location[0], location[1])
+      new_pred = Predator.Predator(random.randint( 0, 359), location[0], location[1])
       self.predators.append(new_pred)
     #initialize prey
     for z in range(0, num_prey):    
       location = self.findEmptySpace(Prey.Prey.radius)
-      new_prey = Prey.Prey(random.random() * 360, location[0], location[1])
+      new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
       self.preys.append(new_prey)
 
   def findEmptySpace(self, radius):
@@ -148,8 +148,6 @@ class Environment:
         # give the predator a general direction of where prey is
         pred.prey_direction = math.ceil(math.degrees(math.atan2(prey_coordinate[1] - pred.y, prey_coordinate[0] - pred.x)))
 
-        # if predator can reach the prey in one turn
-        # TODO: CHANGE THIS PART
         #check each pred step to see if it touches the prey
         # for loop going from steps 1 2 3
           #check each step to see if collision with prey
@@ -190,7 +188,7 @@ class Environment:
         # print "Predator senses nothing"
         pred.hunting = False
         # no prey, so give a random angle
-        pred.prey_direction = math.radians(random.randint(0, 359))
+        pred.prey_direction = random.randint(0, 359)
         # no prey, randomly decides how much to move      
         inc_x = math.cos(pred.direction) * ((random.randint(1, 2)) * pred.radius)
         inc_y = math.sin(pred.direction) * ((random.randint(1, 2)) * pred.radius)
@@ -210,7 +208,6 @@ class Environment:
       if (pred_coordinate is not None):
         # if another predator is sensed, give our pred the general direction
         pred.pred_direction = math.ceil(math.degrees(math.atan2(pred_coordinate[1] - pred.y, pred_coordinate[0] - pred.x)))
-
 
       # run predator NN with new inputs
       pred.update()
@@ -268,30 +265,37 @@ class Environment:
       pred_coord = self.prey_sense_pred(prey)
       if (pred_coord is not None):
         prey.senses_predator = True
-        angle_escape = (math.atan2(pred_coord[1] - prey.y, pred_coord[0] - prey.x))
-        inc_x_escape = math.cos(angle_escape) * (3.0 * prey.radius) 
-        inc_y_escape = math.sin(angle_escape) * (3.0 * prey.radius)
-        # make sure the prey doesn't go out of bounds
-        if (((prey.x + inc_x_escape) < 0 ) or ((prey.x + inc_x_escape) > self.width )):
-          inc_x_escape = inc_x_escape * (-1.0)
-        if (((prey.y + inc_y_escape) < 0 ) or ((prey.y + inc_y_escape) > self.height )):
-          inc_y_escape = inc_y_escape * (-1.0)
-        prey.escape_x = prey.x + inc_x_escape
-        prey.escape_y = prey.y + inc_y_escape
+        #TODO: CHANGE THIS PART
+        # give the prey a general direction of the predator
+        prey.pred_direction = math.ceil(math.degrees(math.atan2(pred_coord[1] - prey.y, pred_coord[0] - prey.x)))
+        
+        for i in xrange(1, 2, 1):
+          inc_x = math.cos(prey.direction) * (1 * prey.radius)
+          inc_y = math.sin(prey.direction) * (1 * prey.radius)
+          # make sure the prey doesn't go out of bounds
+          if (((prey.next_x + inc_x) < 0 ) or ((prey.next_x + inc_x) > self.width )):
+            inc_x = inc_x * (-1.0)
+          if (((prey.next_y + inc_y) < 0 ) or ((prey.next_y + inc_y) > self.height )):
+            inc_y = inc_y * (-1.0)
+          prey.next_x += inc_x
+          prey.next_y += inc_y
+
       else:
         # prey did not sense any predators
         prey.senses_predator = False
-        # move in random direction
-        rand_angle = math.radians(random.randint(0, 360))
-        inc_x_rand = math.cos(rand_angle) * (2.0 * prey.radius)
-        inc_y_rand = math.sin(rand_angle) * (2.0 * prey.radius)
-        # make sure the animat doesn't go out of bounds
-        if (((prey.x + inc_x_rand) < 0 ) or ((prey.x + inc_x_rand) > self.width )):
-          inc_x_rand = inc_x_rand * (-1.0)
-        if (((prey.y + inc_y_rand) < 0 ) or ((prey.y + inc_y_rand) > self.height )):
-          inc_y_rand = inc_y_rand * (-1.0)
-        prey.next_x = prey.x + inc_x_rand
-        prey.next_y = prey.y + inc_y_rand
+        # give it a random direction
+        prey.pred_direction = random.randint(0, 359)
+
+        for i in xrange(1, 2, 1):
+          inc_x_rand = math.cos(prey.direction) * (1.0 * prey.radius)
+          inc_y_rand = math.sin(prey.direction) * (1.0 * prey.radius)
+          # make sure the prey doesn't go out of bounds
+          if (((prey.next_x + inc_x) < 0 ) or ((prey.next_x + inc_x) > self.width )):
+            inc_x = inc_x * (-1.0)
+          if (((prey.next_y + inc_y) < 0 ) or ((prey.next_y + inc_y) > self.height )):
+            inc_y = inc_y * (-1.0)
+          prey.next_x += inc_x
+          prey.next_y += inc_y
 
       # run prey NN with new inputs
       prey.update()
@@ -299,15 +303,10 @@ class Environment:
         # prey doesn't move when eating, stays still
         prey.next_x = prey.x
         prey.next_y = prey.y
-        prey.escape_x = prey.x
-        prey.escape_y = prey.y
+        
       if (prey.want_to_move):
-        if (prey.senses_predator):
-          prey.x = prey.escape_x
-          prey.y = prey.escape_y
-        else:
-          prey.x = prey.next_x
-          prey.y = prey.next_y
+        prey.x = prey.next_x
+        prey.y = prey.next_y
       if (prey.age >= 30 and prey.not_mated):
         self.mature_preys.append(prey)
       # prey dies at age 30
