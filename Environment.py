@@ -22,7 +22,10 @@ class Environment:
     self.num_predator = num_predator
     self.num_prey = num_prey
 
-    # self.iterations = 0
+    # number of iterations where preds still alive
+    self.iterations_pred = 0
+
+    self.no_pred_left = False
 
     #initialize predators
     for z in range(0, num_predator):
@@ -45,6 +48,7 @@ class Environment:
       for y in y_placements:
         if (self.collisionFree(x, y, radius)):
           return (x, y)
+    print "could not find empty space"
 
   #returns true if no collision, false if collision
   def collisionFree(self, x, y, radius):
@@ -104,17 +108,21 @@ class Environment:
   # through diffusion of smell
   def prey_sense_pred(self, prey):
     for pred in self.predators:
-      if ( (abs(prey.x - pred.x) < (6 * prey.radius)) and (abs(prey.y - pred.y) < (6 * prey.radius)) ):
+      if ( (abs(prey.x - pred.x) < (4 * prey.radius)) and (abs(prey.y - pred.y) < (6 * prey.radius)) ):
         return (pred.x, pred.y)
-      elif ( (abs(prey.x - pred.x) < (8 * prey.radius)) and (abs(prey.y - pred.y) < (8 * prey.radius)) ):
+      elif ( (abs(prey.x - pred.x) < (6 * prey.radius)) and (abs(prey.y - pred.y) < (8 * prey.radius)) ):
         return (pred.x, pred.y)
-      elif ( (abs(prey.x - pred.x) < (10 * prey.radius)) and (abs(prey.y - pred.y) < (10 * prey.radius)) ):
+      elif ( (abs(prey.x - pred.x) < (8 * prey.radius)) and (abs(prey.y - pred.y) < (10 * prey.radius)) ):
         return (pred.x, pred.y)
       else:
         continue
     return None
 
   def update_environment(self):
+    # print len(self.predators)
+    if (len(self.predators) > 0):
+      self.iterations_pred += 1
+
     # check to see if any predators can mate
     while (len(self.mature_predators) >= 2):
       parent1 = self.mature_predators.pop(0)
@@ -136,7 +144,7 @@ class Environment:
             else:
               offspring.nn.params[i] = parent2.nn.params[i]
         self.predators.append(offspring)
-        # print "New pred offspring!"
+        print "New pred offspring!"
         self.num_predator += 1
 
     # UPDATE what the predators sense
@@ -166,7 +174,9 @@ class Environment:
           pred.next_y += inc_y
           pred.contact = self.predator_will_touch(pred)
           if (isinstance(pred.contact, Prey.Prey)):
-            return
+            break
+        # print "Pred energy : "
+        # print pred.energy
 
 ########## OLD CODE
 
@@ -218,6 +228,7 @@ class Environment:
       if pred.eat: 
         if (isinstance(pred.contact, Prey.Prey)):
           self.preys.remove(pred.contact)
+          print "A predator KILLED a prey!"
           location = self.findEmptySpace(Prey.Prey.radius)
           new_prey = Prey.Prey(random.random() * 360, location[0], location[1])
           self.preys.append(new_prey)
@@ -227,6 +238,8 @@ class Environment:
       # pred dies at age 30
       if (pred.age >= 30):
         pred.energy = 0
+      # print "Pred energy : "
+      # print pred.energy
 
     # remove dead predators from the environment
     predators_temp = self.predators
@@ -234,6 +247,7 @@ class Environment:
       if (pred.energy <= 0):
         self.predators.remove(pred)
         self.num_predator -= 1
+        print "A predator died!"
 
     # check to see if any preys can mate
     while (len(self.mature_preys) >= 2):
@@ -290,12 +304,12 @@ class Environment:
           inc_x_rand = math.cos(prey.direction) * (1.0 * prey.radius)
           inc_y_rand = math.sin(prey.direction) * (1.0 * prey.radius)
           # make sure the prey doesn't go out of bounds
-          if (((prey.next_x + inc_x) < 0 ) or ((prey.next_x + inc_x) > self.width )):
-            inc_x = inc_x * (-1.0)
-          if (((prey.next_y + inc_y) < 0 ) or ((prey.next_y + inc_y) > self.height )):
-            inc_y = inc_y * (-1.0)
-          prey.next_x += inc_x
-          prey.next_y += inc_y
+          if (((prey.next_x + inc_x_rand) < 0 ) or ((prey.next_x + inc_x_rand) > self.width )):
+            inc_x_rand = inc_x_rand * (-1.0)
+          if (((prey.next_y + inc_y_rand) < 0 ) or ((prey.next_y + inc_y_rand) > self.height )):
+            inc_y_rand = inc_y_rand * (-1.0)
+          prey.next_x += inc_x_rand
+          prey.next_y += inc_y_rand
 
       # run prey NN with new inputs
       prey.update()

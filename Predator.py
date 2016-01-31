@@ -5,14 +5,14 @@ import Prey
 import Environment
 
 class Predator:
-  radius = 5
+  radius = 20
   def __init__(self, direction, x, y):
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(5)
-    hiddenLayer = SigmoidLayer(6)
-    outLayer = LinearLayer(2)
+    inLayer = LinearLayer(8)
+    hiddenLayer = SigmoidLayer(9)
+    outLayer = LinearLayer(4)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
     self.nn.addOutputModule(outLayer)

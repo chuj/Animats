@@ -4,14 +4,14 @@ from pybrain.structure import FullConnection
 import math
 
 class Prey:
-  radius = 5
+  radius = 20
   def __init__(self, direction, x, y):
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(3)
-    hiddenLayer = SigmoidLayer(4)
-    outLayer = LinearLayer(2)
+    inLayer = LinearLayer(5)
+    hiddenLayer = SigmoidLayer(6)
+    outLayer = LinearLayer(4)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
     self.nn.addOutputModule(outLayer)
@@ -24,7 +24,7 @@ class Prey:
     self.nn.sortModules()
     
     # Energy - dies when reaches 0
-    self.energy = 500
+    self.energy = 300
 
     # Location
     self.x = x
@@ -104,7 +104,7 @@ class Prey:
     self.direction -= output_vector[2]
     #direction: turn left (counter clockwise)
     self.direction += output_vector[3]
-    
+
     if (self.want_to_eat):
       if (self.energy >= 400):
         self.energy = 500
