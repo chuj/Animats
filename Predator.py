@@ -56,6 +56,9 @@ class Predator:
     # Age, reaches maturity at age 50
     self.age = 0
 
+    # Generation, which generation this animat belongs to
+    self.generation = 0
+
     # has it mated and reproduced yet?
     self.not_mated = True
 

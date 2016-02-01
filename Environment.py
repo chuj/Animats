@@ -25,6 +25,10 @@ class Environment:
     # number of iterations where preds still alive
     self.iterations_pred = 0
 
+    # Generation that last living pred belonged to
+    self.max_gen_pred = 0
+
+    # Are there any predators left in the environment?
     self.no_pred_left = False
 
     #initialize predators
@@ -119,9 +123,6 @@ class Environment:
     return None
 
   def update_environment(self):
-    # print len(self.predators)
-    if (len(self.predators) > 0):
-      self.iterations_pred += 1
 
     # check to see if any predators can mate
     while (len(self.mature_predators) >= 2):
@@ -143,9 +144,21 @@ class Environment:
               offspring.nn.params[i] = parent1.nn.params[i]
             else:
               offspring.nn.params[i] = parent2.nn.params[i]
+        # update offspring generation
+        if (parent1.generation >= parent2.generation):
+          offspring.generation = parent1.generation + 1
+        else:
+          offspring.generation = parent2.generation + 1
         self.predators.append(offspring)
-        print "New pred offspring!"
+        print "New pred offspring! gen is : %d" % offspring.generation
         self.num_predator += 1
+
+    if (len(self.predators) > 0):
+      # Iterations where predators still alive    
+      self.iterations_pred += 1
+      # Get max generation of pred
+      self.predators.sort(key = lambda x: x.generation, reverse = True)
+      self.max_gen_pred = self.predators[0].generation
 
     # UPDATE what the predators sense
     for pred in self.predators:

@@ -59,6 +59,7 @@ if __name__ == "__main__":
     pygame.display.flip()
     # time.sleep(0.5)
   print "Iterations : %d" % view.environment.iterations_pred
+  print "Max gen pred : %d" % view.environment.max_gen_pred
   print "Predators left : %d" % view.environment.num_predator
   print "Preys left : %d" % view.environment.num_prey
   pygame.quit()
