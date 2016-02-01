@@ -191,22 +191,6 @@ class Environment:
         # print "Pred energy : "
         # print pred.energy
 
-########## OLD CODE
-
-        # distance_to_prey = math.sqrt((pred.x - prey_coordinate[0])**2 + (pred.y - prey_coordinate[1])**2 )
-        # if (distance_to_prey <= (4.0 * pred.radius)):
-        #   pred.next_x = prey_coordinate[0]
-        #   pred.next_y = prey_coordinate[1]
-        # else: 
-        # # predator can't reach prey in one turn, so move as close as it can to prey
-        #   angle = (math.atan2(prey_coordinate[1] - pred.y, prey_coordinate[0] - pred.x))
-        #   inc_x = math.cos(angle) * (4.0 * pred.radius) 
-        #   inc_y = math.sin(angle) * (4.0 * pred.radius)
-        #   pred.next_x = pred.x + inc_x
-        #   pred.next_y = pred.y + inc_y
-
-#####################
-
       else: # predator didn't sense any prey around it, change to idle mode
         # print "Predator senses nothing"
         pred.hunting = False
@@ -238,6 +222,7 @@ class Environment:
       if pred.move:
         pred.x = pred.next_x
         pred.y = pred.next_y
+
       if pred.eat: 
         if (isinstance(pred.contact, Prey.Prey)):
           self.preys.remove(pred.contact)

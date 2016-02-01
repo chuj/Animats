@@ -62,6 +62,9 @@ class Prey:
     # has it mated and reproduced yet?
     self.not_mated = True
 
+    # number of attacking preds
+    self.num_atk_pred = 0
+
   def update(self):
     # metabolism depends on which state the prey is in (escaping from predator, idle)
     if (self.senses_predator is True):
