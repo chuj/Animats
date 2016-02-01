@@ -26,6 +26,9 @@ class Prey:
     # Energy - dies when reaches 0
     self.energy = 300
 
+    # Max Energy. the max amount of energy a prey can have
+    self.max_energy = 500
+
     # Location
     self.x = x
     self.y = y
@@ -64,6 +67,9 @@ class Prey:
 
     # number of attacking preds
     self.num_atk_pred = 0
+
+    # energy per pred. how much energy each predator gains when eating this prey 
+    self.energy_per_pred = 0
 
   def update(self):
     # metabolism depends on which state the prey is in (escaping from predator, idle)

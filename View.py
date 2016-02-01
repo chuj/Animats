@@ -19,10 +19,10 @@ class View:
     self.prey = pygame.image.load("prey_direction.png")
     self.background = pygame.image.load("background.jpg")
 
+    # JUST FOR FUN
     # self.predator = pygame.image.load("x_wing.gif")
     # self.prey = pygame.image.load("t_fighter.png")
     # self.background = pygame.image.load("black_background.jpg")
-
 
     # transform the image sizes to fit
     self.predator_image = pygame.transform.scale(self.predator, (Predator.Predator.radius, Predator.Predator.radius))
@@ -62,7 +62,7 @@ if __name__ == "__main__":
   for i in range(500):
     view.update(1)
     pygame.display.flip()
-    time.sleep(0.5)
+    # time.sleep(0.5)
   print "Iterations : %d" % view.environment.iterations_pred
   print "Max gen pred : %d" % view.environment.max_gen_pred
   print "Predators left : %d" % view.environment.num_predator

@@ -123,43 +123,6 @@ class Environment:
     return None
 
   def update_environment(self):
-
-    # check to see if any predators can mate
-    while (len(self.mature_predators) >= 2):
-      parent1 = self.mature_predators.pop(0)
-      parent2 = self.mature_predators.pop(0)
-      parent1.not_mated = False
-      parent2.not_mated = False
-      # reproduce 2 - 4 offspring
-      num_offspring = random.randint(2 ,4)
-      for x in xrange(num_offspring):
-        offspring_location = self.findEmptySpace(Predator.Predator.radius)
-        offspring = Predator.Predator(random.random() * 360, offspring_location[0], offspring_location[1])
-        # genetic recombination of parent's genotype
-        for i in xrange(len(parent1.nn.params)):
-          # 90% chance for each weight to be inherited from p1 or p2
-          # 10% chance mutation where weight will be random
-          if (random.randint(1,10) < 9):
-            if (random.randint(0,1) > 0):
-              offspring.nn.params[i] = parent1.nn.params[i]
-            else:
-              offspring.nn.params[i] = parent2.nn.params[i]
-        # update offspring generation
-        if (parent1.generation >= parent2.generation):
-          offspring.generation = parent1.generation + 1
-        else:
-          offspring.generation = parent2.generation + 1
-        self.predators.append(offspring)
-        print "New pred offspring! gen is : %d" % offspring.generation
-        self.num_predator += 1
-
-    if (len(self.predators) > 0):
-      # Iterations where predators still alive    
-      self.iterations_pred += 1
-      # Get max generation of pred
-      self.predators.sort(key = lambda x: x.generation, reverse = True)
-      self.max_gen_pred = self.predators[0].generation
-
     # UPDATE what the predators sense
     for pred in self.predators:
       prey_coordinate = self.predator_sense_prey(pred)
@@ -218,10 +181,19 @@ class Environment:
 
       # run predator NN with new inputs
       pred.update()
+
+      #TODO
+      # keep track of how many predators attacking that prey
+      if (isinstance(pred.contact, Prey.Prey) and pred.move and pred.eat):
+        pred.contact.num_atk_pred += 1
+
       # predator makes its action in the environment
       if pred.move:
         pred.x = pred.next_x
         pred.y = pred.next_y
+      else:
+        pred.next_x = pred.x
+        pred.next_y = pred.y
 
       if pred.eat: 
         if (isinstance(pred.contact, Prey.Prey)):
@@ -239,6 +211,31 @@ class Environment:
       # print "Pred energy : "
       # print pred.energy
 
+    #TODO: modify these values when doing experiments
+    for prey in self.preys:
+      # whether atk was successful or not depends on the number of predators
+      if (prey.num_atk_pred > 0):
+        rand_num = random.randint(1, 100)
+        if (prey.num_atk_pred == 1):
+          # 95% chance of dying
+          if (rand_num >= 95):
+            prey.energy = 0
+            prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+        elif (prey.num_atk_pred == 2):
+          # 97% chance of dying
+          if (rand_num >= 97):
+            prey.energy = 0
+            prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+        else:
+          # 100% chance of dying
+          prey.energy = 0
+          prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+
+    # set new energy levels accordingly
+    for pred in self.predators:
+      if (isinstance(pred.contact, Prey.Prey) and pred.move and pred.eat):
+        pred.energy += pred.contact.energy_per_pred
+
     # remove dead predators from the environment
     predators_temp = self.predators
     for pred in predators_temp:
@@ -247,28 +244,12 @@ class Environment:
         self.num_predator -= 1
         print "A predator died!"
 
-    # check to see if any preys can mate
-    while (len(self.mature_preys) >= 2):
-      parent1 = self.mature_preys.pop(0)
-      parent2 = self.mature_preys.pop(0)
-      parent1.not_mated = False
-      parent2.not_mated = False
-      # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1,2)
-      for x in xrange(num_offspring):
-        offspring_location = self.findEmptySpace(Prey.Prey.radius)
-        offspring = Prey.Prey(random.random() * 360, offspring_location[0], offspring_location[1])
-        # genetic recombination of parent's genotype
-        for i in xrange(len(parent1.nn.params)):
-          # 90% chance for each weight to be inherited from p1 or p2
-          # 10% chance mutation where weight will be random
-          if (random.randint(1,10) < 9):
-            if (random.randint(0,1) > 0):
-              offspring.nn.params[i] = parent1.nn.params[i]
-            else:
-              offspring.nn.params[i] = parent2.nn.params[i]
-        self.preys.append(offspring)
-        self.num_prey += 1
+    # remove dead prey from the environment
+    preys_temp = self.preys
+    for prey in preys_temp:
+      if (prey.energy <= 0):
+        self.preys.remove(prey)
+        self.num_prey -= 1
 
     # TODO: modify how prey sense and update themselves with direction
     # update what the prey sense
@@ -324,6 +305,67 @@ class Environment:
       # prey dies at age 30
       if (prey.age >= 50):
         prey.energy = 0
+
+
+    # check to see if any predators can mate
+    while (len(self.mature_predators) >= 2):
+      parent1 = self.mature_predators.pop(0)
+      parent2 = self.mature_predators.pop(0)
+      parent1.not_mated = False
+      parent2.not_mated = False
+      # reproduce 2 - 4 offspring
+      num_offspring = random.randint(2 ,4)
+      for x in xrange(num_offspring):
+        offspring_location = self.findEmptySpace(Predator.Predator.radius)
+        offspring = Predator.Predator(random.random() * 360, offspring_location[0], offspring_location[1])
+        # genetic recombination of parent's genotype
+        for i in xrange(len(parent1.nn.params)):
+          # 90% chance for each weight to be inherited from p1 or p2
+          # 10% chance mutation where weight will be random
+          if (random.randint(1,10) < 9):
+            if (random.randint(0,1) > 0):
+              offspring.nn.params[i] = parent1.nn.params[i]
+            else:
+              offspring.nn.params[i] = parent2.nn.params[i]
+        # update offspring generation
+        if (parent1.generation >= parent2.generation):
+          offspring.generation = parent1.generation + 1
+        else:
+          offspring.generation = parent2.generation + 1
+        self.predators.append(offspring)
+        print "New pred offspring! gen is : %d" % offspring.generation
+        self.num_predator += 1
+
+    # Gives you the max generation that predators survived until
+    if (len(self.predators) > 0):
+      # Iterations where predators still alive    
+      self.iterations_pred += 1
+      # Get max generation of pred
+      self.predators.sort(key = lambda x: x.generation, reverse = True)
+      self.max_gen_pred = self.predators[0].generation
+
+    # check to see if any preys can mate
+    while (len(self.mature_preys) >= 2):
+      parent1 = self.mature_preys.pop(0)
+      parent2 = self.mature_preys.pop(0)
+      parent1.not_mated = False
+      parent2.not_mated = False
+      # reproduce 2 - 4 offspring
+      num_offspring = random.randint(1,2)
+      for x in xrange(num_offspring):
+        offspring_location = self.findEmptySpace(Prey.Prey.radius)
+        offspring = Prey.Prey(random.random() * 360, offspring_location[0], offspring_location[1])
+        # genetic recombination of parent's genotype
+        for i in xrange(len(parent1.nn.params)):
+          # 90% chance for each weight to be inherited from p1 or p2
+          # 10% chance mutation where weight will be random
+          if (random.randint(1,10) < 9):
+            if (random.randint(0,1) > 0):
+              offspring.nn.params[i] = parent1.nn.params[i]
+            else:
+              offspring.nn.params[i] = parent2.nn.params[i]
+        self.preys.append(offspring)
+        self.num_prey += 1
 
     # remove dead prey from the environment
     preys_temp = self.preys

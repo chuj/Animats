@@ -116,6 +116,8 @@ class Predator:
     #direction: turn left (counter clockwise)
     self.direction += output_vector[3]
 
+
+    #TODO: CHANGE THIS PART FOR COOPERATION
     if (self.eat is True):
       # gains energy if eats the prey
       if ((isinstance(self.contact, Prey.Prey))):
