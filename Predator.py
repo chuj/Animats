@@ -74,15 +74,15 @@ class Predator:
   def update(self):
     # metabolism depends on which state the predator is in (hunting or idle)
     if (self.hunting is True):
-      if (self.energy < 50):
-        self.energy = 0
-      else:
-        self.energy -= 50
-    else:
       if (self.energy < 25):
         self.energy = 0
       else:
         self.energy -= 25
+    else:
+      if (self.energy < 10):
+        self.energy = 0
+      else:
+        self.energy -= 10
 
     # Aging
     self.age += 1
@@ -118,25 +118,25 @@ class Predator:
 
 
     #TODO: CHANGE THIS PART FOR COOPERATION
-    if (self.eat is True):
-      # gains energy if eats the prey
-      if ((isinstance(self.contact, Prey.Prey))):
-        if (self.energy >= 250):
-          self.energy = 500
-        else:
-          self.energy += 250
-        # big penalty if try to eat another predator
-      elif ((isinstance(self.contact, Predator))):
-        if (self.energy <= 50):
-            self.energy = 0
-        else:
-            self.energy -= 50
-    # small penalty if try to eat nothing
-    else:
-        if (self.energy <= 25):
-            self.energy = 0
-        else:
-            self.energy -= 25
+    # if (self.eat is True):
+    #   # gains energy if eats the prey
+    #   if ((isinstance(self.contact, Prey.Prey))):
+    #     if (self.energy >= 250):
+    #       self.energy = 500
+    #     else:
+    #       self.energy += 250
+    #     # big penalty if try to eat another predator
+    #   elif ((isinstance(self.contact, Predator))):
+    #     if (self.energy <= 50):
+    #         self.energy = 0
+    #     else:
+    #         self.energy -= 50
+    # # small penalty if try to eat nothing
+    # else:
+    #     if (self.energy <= 25):
+    #         self.energy = 0
+    #     else:
+    #         self.energy -= 25
 
 
 

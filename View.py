@@ -52,7 +52,6 @@ class View:
 # main function
 if __name__ == "__main__":
   view = View(800, 800, 40, 40)
-
   for predator in view.environment.predators:
     view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
   for prey in view.environment.preys:
@@ -63,10 +62,22 @@ if __name__ == "__main__":
     view.update(1)
     pygame.display.flip()
     # time.sleep(0.5)
+  results = open('results', 'w')
+  results.write("Iterations : %d \n" % view.environment.iterations_pred)
   print "Iterations : %d" % view.environment.iterations_pred
+  results.write("Max gen pred : %d \n" % view.environment.max_gen_pred)
   print "Max gen pred : %d" % view.environment.max_gen_pred
+  results.write("Predators left : %d \n" % view.environment.num_predator)
   print "Predators left : %d" % view.environment.num_predator
+  results.write("Preys left : %d \n" % view.environment.num_prey)
   print "Preys left : %d" % view.environment.num_prey
+  # write the surviving predator neural nets
+  results.write("Predator Neural Nets : \n")
+  for x in range(len(view.environment.pred_neural_nets)):
+    results.write(str(view.environment.pred_neural_nets[x]))
+    results.write("\n")
+  results.close()
+
   pygame.quit()
 
 

@@ -6,9 +6,10 @@ import logging
 
 class Environment:
   def __init__ (self, width, height, num_predator, num_prey):
-    # logging
-    filename = "simulation.log"
-    logging.basicConfig(filename = filename, level = logging.DEBUG)
+    # logging: currently turned off
+    # filename = "simulation.log"
+    # logging.basicConfig(filename = filename, level = logging.DEBUG)
+    
     #array to hold predator and prey objs
     self.predators = []
     self.preys = []
@@ -30,6 +31,9 @@ class Environment:
 
     # Are there any predators left in the environment?
     self.no_pred_left = False
+
+    # predator neural nets
+    self.pred_neural_nets = []
 
     #initialize predators
     for z in range(0, num_predator):
@@ -200,9 +204,11 @@ class Environment:
           self.preys.remove(pred.contact)
           print "A predator KILLED a prey!"
           location = self.findEmptySpace(Prey.Prey.radius)
-          new_prey = Prey.Prey(random.random() * 360, location[0], location[1])
+          new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
           self.preys.append(new_prey)
         pred.contact = None
+
+
       if (pred.age >= 15 and pred.not_mated):
         self.mature_predators.append(pred)
       # pred dies at age 30
@@ -250,6 +256,11 @@ class Environment:
       if (prey.energy <= 0):
         self.preys.remove(prey)
         self.num_prey -= 1
+        # # when one prey dies, respawn another
+        # location = self.findEmptySpace(Prey.Prey.radius)
+        # new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
+        # self.preys.append(new_prey)
+        # self.num_prey += 1
 
     # TODO: modify how prey sense and update themselves with direction
     # update what the prey sense
@@ -314,10 +325,10 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(2 ,4)
+      num_offspring = random.randint(1 ,2)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Predator.Predator.radius)
-        offspring = Predator.Predator(random.random() * 360, offspring_location[0], offspring_location[1])
+        offspring = Predator.Predator(random.random() * 359, offspring_location[0], offspring_location[1])
         # genetic recombination of parent's genotype
         for i in xrange(len(parent1.nn.params)):
           # 90% chance for each weight to be inherited from p1 or p2
@@ -351,7 +362,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1,2)
+      num_offspring = random.randint(1,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Prey.Prey.radius)
         offspring = Prey.Prey(random.random() * 360, offspring_location[0], offspring_location[1])
@@ -374,6 +385,11 @@ class Environment:
         self.preys.remove(prey)
         self.num_prey -= 1
 
+    # clear the old neural nets
+    self.pred_neural_nets = []
+    # save the surviving predators' neural nets
+    for pred in self.predators:
+      self.pred_neural_nets.append(pred.nn.params)
     # log the number of predator and prey after this iteration
-    logging.info("Num Pred:%d         Num Prey:%d" % (self.num_predator, self.num_prey))
+    # logging.info("Num Pred:%d         Num Prey:%d" % (self.num_predator, self.num_prey))
 
