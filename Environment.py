@@ -83,11 +83,11 @@ class Environment:
   def predator_sense_prey(self, predator):
     for prey in self.preys:
       if ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
-        return (prey.x, prey.y)
+        return (prey.x, prey.y, prey.radius)
       elif ( (abs(predator.x - prey.x) < (10 * predator.radius)) and (abs(predator.y - prey.y) < (10 * predator.radius)) ):
-        return (prey.x, prey.y)
+        return (prey.x, prey.y, prey.radius)
       elif ( (abs(predator.x - prey.x) < (12 * predator.radius)) and (abs(predator.y - prey.y) < (12 * predator.radius)) ):
-        return (prey.x, prey.y)
+        return (prey.x, prey.y, prey.radius)
       else:
         continue
     return None
@@ -112,7 +112,7 @@ class Environment:
         return prey
     return self
 
-  # function to allow preys to sense the world around them
+  # function to allow preys to sense predators around them
   # through diffusion of smell
   def prey_sense_pred(self, prey):
     for pred in self.predators:
@@ -126,6 +126,20 @@ class Environment:
         continue
     return None
 
+  # function to allow preys to sense predators around them
+  # through diffusion of smell
+  def prey_sense_prey(self, prey):
+    for prey_to_sense in self.preys:
+      if ( (abs(prey.x - prey_to_sense.x) < (4 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (6 * prey.radius)) ):
+        return (prey_to_sense.x, prey_to_sense.y, prey_to_sense.radius)
+      elif ( (abs(prey.x - prey_to_sense.x) < (6 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (8 * prey.radius)) ):
+        return (prey_to_sense.x, prey_to_sense.y, prey_to_sense.radius)
+      elif ( (abs(prey.x - prey_to_sense.x) < (8 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (10 * prey.radius)) ):
+        return (prey_to_sense.x, prey_to_sense.y, prey_to_sense.radius)
+      else:
+        continue
+    return None
+
   def update_environment(self):
     # UPDATE what the predators sense
     for pred in self.predators:
@@ -133,6 +147,8 @@ class Environment:
       # if predator senses a prey, change to hunting mode
       if (prey_coordinate is not None):
         pred.hunting = True
+        # give predator the radius of the prey
+        pred.prey_radius = prey_coordinate[2]
         # give the predator a general direction of where prey is
         pred.prey_direction = math.ceil(math.degrees(math.atan2(prey_coordinate[1] - pred.y, prey_coordinate[0] - pred.x)))
 
@@ -155,6 +171,7 @@ class Environment:
           pred.contact = self.predator_will_touch(pred)
           if (isinstance(pred.contact, Prey.Prey)):
             break
+
         # print "Pred energy : "
         # print pred.energy
 
@@ -266,6 +283,15 @@ class Environment:
     # TODO: modify how prey sense and update themselves with direction
     # update what the prey sense
     for prey in self.preys:
+      # if prey senses another prey, give direction and radius of other prey as input
+      prey_coord = self.prey_sense_prey(prey)
+      if (prey_coord is not None):
+        # give prey the radius of the other prey
+        prey.prey_radius = prey_coord[2]
+        # give the prey a general direction of other prey
+        prey.prey_direction = math.ceil(math.degrees(math.atan2(prey_coord[1] - prey.y, prey_coord[0] - prey.x)))
+
+
       # if prey senses a predator, change to escape mode
       pred_coord = self.prey_sense_pred(prey)
       if (pred_coord is not None):

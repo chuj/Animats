@@ -10,8 +10,8 @@ class Predator:
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(8)
-    hiddenLayer = SigmoidLayer(9)
+    inLayer = LinearLayer(9)
+    hiddenLayer = SigmoidLayer(10)
     outLayer = LinearLayer(4)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
@@ -37,6 +37,9 @@ class Predator:
 
     # prey's direction. general direction to where prey is
     self.prey_direction = 0
+
+    # prey's radius
+    self.prey_radius = 0
 
     # other predator's direction. general direction to where the predator is
     self.pred_direction = 0
@@ -98,6 +101,7 @@ class Predator:
                     (2000 * self.energy),
                     (2000 * self.direction),
                     (2000 * self.prey_direction),
+                    (2000 * self.prey_radius),
                     (2000 * self.pred_direction)
                     )
 
