@@ -4,8 +4,11 @@ from pybrain.structure import FullConnection
 import math
 
 class Prey:
-  radius = 20
+  # initial radius
+  init_radius = 20
   def __init__(self, direction, x, y):
+    # radius
+    self.radius = 20
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
@@ -24,7 +27,7 @@ class Prey:
     self.nn.sortModules()
     
     # Energy - dies when reaches 0
-    self.energy = 300
+    self.energy = 400
 
     # Max Energy. the max amount of energy a prey can have
     self.max_energy = 500

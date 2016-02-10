@@ -26,7 +26,7 @@ class View:
 
     # transform the image sizes to fit
     self.predator_image = pygame.transform.scale(self.predator, (Predator.Predator.radius, Predator.Predator.radius))
-    self.prey_image = pygame.transform.scale(self.prey, (Prey.Prey.radius, Prey.Prey.radius))
+    self.prey_image = pygame.transform.scale(self.prey, (Prey.Prey.init_radius, Prey.Prey.init_radius))
     self.background = pygame.transform.scale(self.background, (width,height))
 
     # initialize the Environment
@@ -51,14 +51,14 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 40, 40)
+  view = View(800, 800, 20, 40)
   for predator in view.environment.predators:
     view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
   for prey in view.environment.preys:
     view.surface.blit(view.prey_image, (prey.x - prey.radius, prey.y - prey.radius))
   pygame.display.flip()
   # time.sleep(2)
-  for i in range(500):
+  for i in range(700):
     view.update(1)
     pygame.display.flip()
     # time.sleep(0.5)

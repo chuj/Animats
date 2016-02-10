@@ -26,7 +26,7 @@ class Predator:
     self.nn.sortModules()
     
     # Energy - dies when reaches 0
-    self.energy = 500
+    self.energy = 400
 
     # Location
     self.x = x
