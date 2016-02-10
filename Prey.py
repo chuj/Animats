@@ -8,12 +8,12 @@ class Prey:
   init_radius = 20
   def __init__(self, direction, x, y):
     # radius
-    self.radius = 20
+    self.radius = self.init_radius
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(5)
-    hiddenLayer = SigmoidLayer(6)
+    inLayer = LinearLayer(6)
+    hiddenLayer = SigmoidLayer(7)
     outLayer = LinearLayer(4)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
@@ -92,6 +92,8 @@ class Prey:
     
     # Aging
     self.age += 1
+
+
     
     # Input vector
         # input values are determined by what the animat 
@@ -101,7 +103,8 @@ class Prey:
                     (2000 * self.energy),
                     (2000 * self.is_hungry),
                     (2000 * self.direction),
-                    (2000 * self.pred_direction)
+                    (2000 * self.pred_direction),
+                    (2000 * self.age)
                     )
 
     # Activate the nn
