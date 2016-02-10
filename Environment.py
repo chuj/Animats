@@ -42,7 +42,7 @@ class Environment:
       self.predators.append(new_pred)
     #initialize prey
     for z in range(0, num_prey):    
-      location = self.findEmptySpace(Prey.Prey.radius)
+      location = self.findEmptySpace(Prey.Prey.init_radius)
       new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
       self.preys.append(new_prey)
 
@@ -203,9 +203,10 @@ class Environment:
         if (isinstance(pred.contact, Prey.Prey)):
           self.preys.remove(pred.contact)
           print "A predator KILLED a prey!"
-          location = self.findEmptySpace(Prey.Prey.radius)
-          new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
-          self.preys.append(new_prey)
+          self.num_prey -= 1
+          # location = self.findEmptySpace(Prey.Prey.init_radius)
+          # new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
+          # self.preys.append(new_prey)
         pred.contact = None
 
 
@@ -311,7 +312,7 @@ class Environment:
       if (prey.want_to_move):
         prey.x = prey.next_x
         prey.y = prey.next_y
-      if (prey.age >= 30 and prey.not_mated):
+      if (prey.age >= 15 and prey.not_mated):
         self.mature_preys.append(prey)
       # prey dies at age 30
       if (prey.age >= 50):
@@ -364,7 +365,7 @@ class Environment:
       # reproduce 2 - 4 offspring
       num_offspring = random.randint(1,3)
       for x in xrange(num_offspring):
-        offspring_location = self.findEmptySpace(Prey.Prey.radius)
+        offspring_location = self.findEmptySpace(Prey.Prey.init_radius)
         offspring = Prey.Prey(random.random() * 360, offspring_location[0], offspring_location[1])
         # genetic recombination of parent's genotype
         for i in xrange(len(parent1.nn.params)):
