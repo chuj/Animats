@@ -392,7 +392,7 @@ class Environment:
       num_offspring = random.randint(1,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Prey.Prey.init_radius)
-        offspring = Prey.Prey(random.random() * 360, offspring_location[0], offspring_location[1])
+        offspring = Prey.Prey(random.random() * 359, offspring_location[0], offspring_location[1])
         # genetic recombination of parent's genotype
         for i in xrange(len(parent1.nn.params)):
           # 90% chance for each weight to be inherited from p1 or p2
