@@ -416,7 +416,7 @@ class Environment:
               offspring.nn.params[i] = parent2.nn.params[i]
         self.preys.append(offspring)
         self.num_prey += 1
-      self.mature_preys = []
+    self.mature_preys = []
 
     # remove dead prey from the environment
     preys_temp = self.preys
