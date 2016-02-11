@@ -56,6 +56,9 @@ class Predator:
     # what the predator would come into contact with if moves to next_x, next_y
     self.contact = None
 
+    # what the predator is currently in contact with
+    self.current_contact = None
+
     # Age, reaches maturity at age 50
     self.age = 0
 

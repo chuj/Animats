@@ -106,9 +106,16 @@ class Environment:
     return None
 
   def predator_will_touch(self, predator):
-    # check to see if the predator is touching a prey
+    # check to see if the predator will touch a prey
     for prey in self.preys:
       if ((abs(predator.next_x - prey.x) < (2 * predator.radius)) and (abs(predator.next_y - prey.y) < (2 * predator.radius))):
+        return prey
+    return self
+
+  def predator_is_touching(self, predator):
+    # check to see if the predator is currently touching a prey
+    for prey in self.preys:
+      if ((abs(predator.x - prey.x) < (2 * predator.radius)) and (abs(predator.y - prey.y) < (2 * predator.radius))):
         return prey
     return self
 
@@ -191,6 +198,7 @@ class Environment:
           inc_y = inc_y * (-1.0)
         pred.next_x += inc_x
         pred.next_y += inc_y
+
       # update pred.contact
       pred.contact = self.predator_will_touch(pred)
       
@@ -216,25 +224,6 @@ class Environment:
         pred.next_x = pred.x
         pred.next_y = pred.y
 
-      if pred.eat: 
-        if (isinstance(pred.contact, Prey.Prey)):
-          self.preys.remove(pred.contact)
-          print "A predator KILLED a prey!"
-          self.num_prey -= 1
-          # location = self.findEmptySpace(Prey.Prey.init_radius)
-          # new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
-          # self.preys.append(new_prey)
-        pred.contact = None
-
-
-      if (pred.age >= 15 and pred.not_mated):
-        self.mature_predators.append(pred)
-      # pred dies at age 30
-      if (pred.age >= 30):
-        pred.energy = 0
-      # print "Pred energy : "
-      # print pred.energy
-
     #TODO: modify these values when doing experiments
     for prey in self.preys:
       # whether atk was successful or not depends on the number of predators
@@ -255,10 +244,26 @@ class Environment:
           prey.energy = 0
           prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
 
+    for pred in self.predators:
+      pred.current_contact = self.predator_is_touching(pred)
+      if (isinstance(pred.current_contact, Prey.Prey) and (pred.current_contact.energy == 0) and pred.eat):
+        self.preys.remove(pred.current_contact)
+        print "A predator KILLED a prey!"
+        self.num_prey -= 1
+        # location = self.findEmptySpace(Prey.Prey.init_radius)
+        # new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
+        # self.preys.append(new_prey)
+      pred.current_contact = None
+      pred.contact = None
+
+
     # set new energy levels accordingly
     for pred in self.predators:
       if (isinstance(pred.contact, Prey.Prey) and pred.move and pred.eat):
         pred.energy += pred.contact.energy_per_pred
+      # pred dies at age 30
+      if (pred.age >= 40):
+        pred.energy = 0
 
     # remove dead predators from the environment
     predators_temp = self.predators
@@ -338,12 +343,18 @@ class Environment:
       if (prey.want_to_move):
         prey.x = prey.next_x
         prey.y = prey.next_y
-      if (prey.age >= 15 and prey.not_mated):
-        self.mature_preys.append(prey)
-      # prey dies at age 30
+      # prey dies at age 50
       if (prey.age >= 50):
         prey.energy = 0
 
+    # put mature animats into the list of mature predators and preys
+    for pred in self.predators:
+      if (pred.age >= 15 and pred.not_mated):
+        self.mature_predators.append(pred)
+
+    for prey in self.preys:
+      if (prey.age >= 15 and prey.not_mated):
+        self.mature_preys.append(prey)
 
     # check to see if any predators can mate
     while (len(self.mature_predators) >= 2):
@@ -352,7 +363,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1 ,2)
+      num_offspring = random.randint(1 ,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Predator.Predator.radius)
         offspring = Predator.Predator(random.random() * 359, offspring_location[0], offspring_location[1])
@@ -373,6 +384,7 @@ class Environment:
         self.predators.append(offspring)
         print "New pred offspring! gen is : %d" % offspring.generation
         self.num_predator += 1
+    self.mature_predators = []
 
     # Gives you the max generation that predators survived until
     if (len(self.predators) > 0):
@@ -404,6 +416,7 @@ class Environment:
               offspring.nn.params[i] = parent2.nn.params[i]
         self.preys.append(offspring)
         self.num_prey += 1
+      self.mature_preys = []
 
     # remove dead prey from the environment
     preys_temp = self.preys
