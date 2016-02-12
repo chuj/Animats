@@ -55,7 +55,7 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 5, 50)
+  view = View(800, 800, 15, 50)
   for predator in view.environment.predators:
     view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
   for prey in view.environment.preys:

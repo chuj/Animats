@@ -225,24 +225,48 @@ class Environment:
         pred.next_y = pred.y
 
     #TODO: modify these values when doing experiments
+    # success of the attack depends on:
+    #       number of attacking predators
+    #       size of the prey
     for prey in self.preys:
       # whether atk was successful or not depends on the number of predators
       if (prey.num_atk_pred > 0):
         rand_num = random.randint(1, 100)
-        if (prey.num_atk_pred == 1):
-          # 95% chance of dying
-          if (rand_num >= 95):
+        if (prey.radius == Prey.Prey.init_radius):
+          if (prey.num_atk_pred == 1):
+            # 95% chance of dying
+            if (rand_num >= 95):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+          elif (prey.num_atk_pred == 2):
+            # 97% chance of dying
+            if (rand_num >= 97):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+          else:
+            # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-        elif (prey.num_atk_pred == 2):
-          # 97% chance of dying
-          if (rand_num >= 97):
+        else: # a large prey is harder to kill, and injures the predator when the attack fails
+          if (prey.num_atk_pred == 1):
+            # 10% chance of dying
+            if (rand_num >= 90):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+              prey.energy_per_pred = (-200.0)
+          elif (prey.num_atk_pred == 2):
+            # 80% chance of dying
+            if (rand_num >= 20):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+              prey.energy_per_pred = (-200.0)
+          else:
+            # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-        else:
-          # 100% chance of dying
-          prey.energy = 0
-          prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+
 
     for pred in self.predators:
       pred.current_contact = self.predator_is_touching(pred)
@@ -401,7 +425,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1,3)
+      num_offspring = random.randint(2,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Prey.Prey.init_radius)
         offspring = Prey.Prey(random.random() * 359, offspring_location[0], offspring_location[1])
