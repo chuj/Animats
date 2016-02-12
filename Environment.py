@@ -56,7 +56,7 @@ class Environment:
       for y in y_placements:
         if (self.collisionFree(x, y, radius)):
           return (x, y)
-    print "could not find empty space"
+    # print "could not find empty space"
 
   #returns true if no collision, false if collision
   def collisionFree(self, x, y, radius):
@@ -248,7 +248,7 @@ class Environment:
       pred.current_contact = self.predator_is_touching(pred)
       if (isinstance(pred.current_contact, Prey.Prey) and (pred.current_contact.energy == 0) and pred.eat):
         self.preys.remove(pred.current_contact)
-        print "A predator KILLED a prey!"
+        # print "A predator KILLED a prey!"
         self.num_prey -= 1
         # location = self.findEmptySpace(Prey.Prey.init_radius)
         # new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
@@ -271,7 +271,7 @@ class Environment:
       if (pred.energy <= 0):
         self.predators.remove(pred)
         self.num_predator -= 1
-        print "A predator died!"
+        # print "A predator died!"
 
     # remove dead prey from the environment
     preys_temp = self.preys
@@ -424,6 +424,10 @@ class Environment:
       if (prey.energy <= 0):
         self.preys.remove(prey)
         self.num_prey -= 1
+
+    for prey in self.preys:
+      if (prey.age >= 5):
+        prey.radius = Prey.Prey.large_radius
 
     # clear the old neural nets
     self.pred_neural_nets = []

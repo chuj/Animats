@@ -21,12 +21,13 @@ class View:
 
     # JUST FOR FUN
     # self.predator = pygame.image.load("x_wing.gif")
-    # self.prey = pygame.image.load("t_fighter.png")
+    # self.prey_test = pygame.image.load("t_fighter.png")
     # self.background = pygame.image.load("black_background.jpg")
 
     # transform the image sizes to fit
     self.predator_image = pygame.transform.scale(self.predator, (Predator.Predator.radius, Predator.Predator.radius))
     self.prey_image = pygame.transform.scale(self.prey, (Prey.Prey.init_radius, Prey.Prey.init_radius))
+    self.large_prey_image = pygame.transform.scale(self.prey, (Prey.Prey.large_radius, Prey.Prey.large_radius))
     self.background = pygame.transform.scale(self.background, (width,height))
 
     # initialize the Environment
@@ -43,15 +44,18 @@ class View:
     view.surface.blit(view.background, (0,0))
     # repaint the animats
     for predator in view.environment.predators:
-      view.surface.blit( pygame.transform.rotate(view.predator_image, 360 - predator.direction) , (predator.x - predator.radius, predator.y - predator.radius))
+      view.surface.blit( pygame.transform.rotate(view.predator_image, 359 - predator.direction) , (predator.x - predator.radius, predator.y - predator.radius))
     for prey in view.environment.preys:
-      view.surface.blit( pygame.transform.rotate(view.prey_image, 360 - prey.direction), (prey.x - prey.radius, prey.y - prey.radius))
+      if prey.age < 15:
+        view.surface.blit( pygame.transform.rotate(view.prey_image, 359 - prey.direction), (prey.x - prey.radius, prey.y - prey.radius))
+      else:
+        view.surface.blit( pygame.transform.rotate(view.large_prey_image, 359 - prey.direction), (prey.x - prey.radius, prey.y - prey.radius))
 
 
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 20, 40)
+  view = View(800, 800, 5, 50)
   for predator in view.environment.predators:
     view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
   for prey in view.environment.preys:

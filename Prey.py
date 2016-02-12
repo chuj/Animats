@@ -6,6 +6,8 @@ import math
 class Prey:
   # initial radius
   init_radius = 20
+  # large radius
+  large_radius = 25
   def __init__(self, direction, x, y):
     # radius
     self.radius = self.init_radius
