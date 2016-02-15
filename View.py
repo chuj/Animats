@@ -1,7 +1,7 @@
 import Environment
 import Predator
 import Prey
-
+import Obstacle
 import pygame
 import math
 import time
@@ -18,6 +18,7 @@ class View:
     self.predator = pygame.image.load("predator_direction.png")
     self.prey = pygame.image.load("prey_direction.png")
     self.background = pygame.image.load("background.jpg")
+    self.obstacle = pygame.image.load("obstacle.jpg")
 
     # JUST FOR FUN
     # self.predator = pygame.image.load("x_wing.gif")
@@ -28,19 +29,24 @@ class View:
     self.predator_image = pygame.transform.scale(self.predator, (Predator.Predator.radius, Predator.Predator.radius))
     self.prey_image = pygame.transform.scale(self.prey, (Prey.Prey.init_radius, Prey.Prey.init_radius))
     self.background = pygame.transform.scale(self.background, (width,height))
+    self.obstacle_image_vert = pygame.transform.scale(self.obstacle, (100, 200))
+    self.obstacle_image_horz = pygame.transform.rotate(self.obstacle_image_vert, -90)
+    self.obstacle_image_horz = pygame.transform.scale(self.obstacle_image_horz, ( 300,100) )
 
     # initialize the Environment
     self.environment = Environment.Environment(width, height, num_predator, num_prey)
     print "environment initialized \n"
 
   def update(self, iterations):
-    # print "still in second main loop" this works fine too
     # update the environment as many times as specified
     for x in range(iterations):
       self.environment.update_environment()
 
     # repaint the surface
     view.surface.blit(view.background, (0,0))
+    # repaint the obstacles
+    view.surface.blit(view.obstacle_image_vert, (view.environment.obstacles[0].x_bot, view.environment.obstacles[0].y_top) ) 
+    view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
     # repaint the animats
     for predator in view.environment.predators:
       view.surface.blit( pygame.transform.rotate(view.predator_image, 360 - predator.direction) , (predator.x - predator.radius, predator.y - predator.radius))
@@ -51,7 +57,9 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 20, 40)
+  view = View(800, 800, 0, 0)
+  view.surface.blit(view.obstacle_image_vert, (view.environment.obstacles[0].x_bot, view.environment.obstacles[0].y_top) ) 
+  view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
   for predator in view.environment.predators:
     view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
   for prey in view.environment.preys:

@@ -1,6 +1,7 @@
 import random
 import Predator
 import Prey
+import Obstacle
 import math
 import logging
 
@@ -35,6 +36,16 @@ class Environment:
     # predator neural nets
     self.pred_neural_nets = []
 
+    # array to hold obstacles objs
+    self.obstacles = []
+
+    # initialize obstacles (for now the obstacles locations are input manually here)
+    # note: top left corner of window is 0,0
+    # (x_top, x_bot, y_top, y_bot)
+    obs_1 = Obstacle.Obstacle(250, 150, 200, 400) # vertical spanning obstacle
+    self.obstacles.append(obs_1)
+    obs_2 = Obstacle.Obstacle(450 , 150, 400, 500) # horizontally spanning obstacle
+    self.obstacles.append(obs_2)
     #initialize predators
     for z in range(0, num_predator):
       location = self.findEmptySpace(Predator.Predator.radius)
@@ -72,6 +83,10 @@ class Environment:
     # collision with prey
     for prey in self.preys:
       if ((abs(x - prey.x) < (2 * radius)) and (abs(y - prey.y) < (2 * radius))):
+        return False
+    # collision with obstacles
+    for obs in self.obstacles:
+      if ( ((obs.x_bot - radius) <= x <= (obs.x_top - radius)) and ((obs.y_bot - radius) <= y <= (obs.y_top - radius)) ):
         return False
     # the position is collision free
     return True
