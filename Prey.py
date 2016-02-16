@@ -6,6 +6,8 @@ import math
 class Prey:
   # initial radius
   init_radius = 20
+  # large radius
+  large_radius = 25
   def __init__(self, direction, x, y):
     # radius
     self.radius = self.init_radius
@@ -86,15 +88,15 @@ class Prey:
   def update(self):
     # metabolism depends on which state the prey is in (escaping from predator, idle)
     if (self.senses_predator is True):
-      if (self.energy < 50):
+      if (self.energy < 20):
         self.energy = 0
       else:
-        self.energy -= 50
+        self.energy -= 20
     else: # idle mode, consumes less energy
-      if (self.energy < 25):
+      if (self.energy < 10):
         self.energy = 0
       else:
-        self.energy -= 25
+        self.energy -= 10
 
     if (self.energy < 100):
       self.is_hungry = True

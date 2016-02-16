@@ -22,12 +22,13 @@ class View:
 
     # JUST FOR FUN
     # self.predator = pygame.image.load("x_wing.gif")
-    # self.prey = pygame.image.load("t_fighter.png")
+    # self.prey_test = pygame.image.load("t_fighter.png")
     # self.background = pygame.image.load("black_background.jpg")
 
     # transform the image sizes to fit
     self.predator_image = pygame.transform.scale(self.predator, (Predator.Predator.radius, Predator.Predator.radius))
     self.prey_image = pygame.transform.scale(self.prey, (Prey.Prey.init_radius, Prey.Prey.init_radius))
+    self.large_prey_image = pygame.transform.scale(self.prey, (Prey.Prey.large_radius, Prey.Prey.large_radius))
     self.background = pygame.transform.scale(self.background, (width,height))
     self.obstacle_image_vert = pygame.transform.scale(self.obstacle, (100, 200))
     self.obstacle_image_horz = pygame.transform.rotate(self.obstacle_image_vert, -90)
@@ -50,9 +51,12 @@ class View:
     view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
     # repaint the animats
     for predator in view.environment.predators:
-      view.surface.blit( pygame.transform.rotate(view.predator_image, 360 - predator.direction) , (predator.x - predator.radius, predator.y - predator.radius))
+      view.surface.blit( pygame.transform.rotate(view.predator_image, 359 - predator.direction) , (predator.x - predator.radius, predator.y - predator.radius))
     for prey in view.environment.preys:
-      view.surface.blit( pygame.transform.rotate(view.prey_image, 360 - prey.direction), (prey.x - prey.radius, prey.y - prey.radius))
+      if prey.age < 15:
+        view.surface.blit( pygame.transform.rotate(view.prey_image, 359 - prey.direction), (prey.x - prey.radius, prey.y - prey.radius))
+      else:
+        view.surface.blit( pygame.transform.rotate(view.large_prey_image, 359 - prey.direction), (prey.x - prey.radius, prey.y - prey.radius))
 
 
 

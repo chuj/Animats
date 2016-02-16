@@ -67,7 +67,7 @@ class Environment:
       for y in y_placements:
         if (self.collisionFree(x, y, radius)):
           return (x, y)
-    print "could not find empty space"
+    # print "could not find empty space"
 
   #returns true if no collision, false if collision
   def collisionFree(self, x, y, radius):
@@ -281,30 +281,54 @@ class Environment:
         pred.next_y = pred.y
 
     #TODO: modify these values when doing experiments
+    # success of the attack depends on:
+    #       number of attacking predators
+    #       size of the prey
     for prey in self.preys:
       # whether atk was successful or not depends on the number of predators
       if (prey.num_atk_pred > 0):
         rand_num = random.randint(1, 100)
-        if (prey.num_atk_pred == 1):
-          # 95% chance of dying
-          if (rand_num >= 95):
+        if (prey.radius == Prey.Prey.init_radius):
+          if (prey.num_atk_pred == 1):
+            # 95% chance of dying
+            if (rand_num >= 95):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+          elif (prey.num_atk_pred == 2):
+            # 97% chance of dying
+            if (rand_num >= 97):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+          else:
+            # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-        elif (prey.num_atk_pred == 2):
-          # 97% chance of dying
-          if (rand_num >= 97):
+        else: # a large prey is harder to kill, and injures the predator when the attack fails
+          if (prey.num_atk_pred == 1):
+            # 10% chance of dying
+            if (rand_num >= 90):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+              prey.energy_per_pred = (-200.0)
+          elif (prey.num_atk_pred == 2):
+            # 80% chance of dying
+            if (rand_num >= 20):
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+              prey.energy_per_pred = (-200.0)
+          else:
+            # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-        else:
-          # 100% chance of dying
-          prey.energy = 0
-          prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+
 
     for pred in self.predators:
       pred.current_contact = self.predator_is_touching(pred)
       if (isinstance(pred.current_contact, Prey.Prey) and (pred.current_contact.energy == 0) and pred.eat):
         self.preys.remove(pred.current_contact)
-        print "A predator KILLED a prey!"
+        # print "A predator KILLED a prey!"
         self.num_prey -= 1
         # location = self.findEmptySpace(Prey.Prey.init_radius)
         # new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
@@ -327,7 +351,7 @@ class Environment:
       if (pred.energy <= 0):
         self.predators.remove(pred)
         self.num_predator -= 1
-        print "A predator died!"
+        # print "A predator died!"
 
     # remove dead prey from the environment
     preys_temp = self.preys
@@ -465,7 +489,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1,3)
+      num_offspring = random.randint(2,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Prey.Prey.init_radius)
         offspring = Prey.Prey(random.random() * 359, offspring_location[0], offspring_location[1])
@@ -488,6 +512,10 @@ class Environment:
       if (prey.energy <= 0):
         self.preys.remove(prey)
         self.num_prey -= 1
+
+    for prey in self.preys:
+      if (prey.age >= 5):
+        prey.radius = Prey.Prey.large_radius
 
     # clear the old neural nets
     self.pred_neural_nets = []
