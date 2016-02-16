@@ -124,20 +124,21 @@ class Environment:
   # returns the center of the obstacle
   def predator_sense_obs(self, predator):
     for obs in self.obstacles:
-      pred_distance_x = abs(predator.x - obs.center[0])
-      pred_distance_y = abs(predator.y - obs.center[1])
+      for i in xrange(8, 14, 2):
+        pred_distance_x = abs(predator.x - obs.center[0])
+        pred_distance_y = abs(predator.y - obs.center[1])
 
-      if (pred_distance_x > (obs.width / 2 )):
-        return obs.center
-      if (pred_distance_y > (obs.height / 2 )):
-        return obs.center
-      if ( pred_distance_x <= (obs.width) / 2):
-        return obs.center
-      if ( pred_distance_y <= (obs.height) / 2):
-        return obs.center
-      corner_distance_sq = math.pow((pred_distance_x - (obs.width / 2)) , 2 ) + math.pow((pred_distance_y - (obs.height / 2)) , 2 )
-      if (corner_distance_sq <= math.pow(predator.radius , 2)):
-        return obs.center
+        if (pred_distance_x > (obs.width / 2 + predator.radius * i)):
+          break
+        if (pred_distance_y > (obs.height / 2 + predator.radius * i)):
+          break
+        if ( pred_distance_x <= (obs.width) / 2):
+          return obs.center
+        if ( pred_distance_y <= (obs.height) / 2):
+          return obs.center
+        corner_distance_sq = math.pow((pred_distance_x - (obs.width / 2)) , 2 ) + math.pow((pred_distance_y - (obs.height / 2)) , 2 )
+        if (corner_distance_sq <= math.pow(predator.radius * i , 2)):
+          return obs.center
     return None
 
   def predator_will_touch(self, predator):
