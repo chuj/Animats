@@ -57,7 +57,7 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 0, 0)
+  view = View(800, 800, 20, 60)
   view.surface.blit(view.obstacle_image_vert, (view.environment.obstacles[0].x_bot, view.environment.obstacles[0].y_top) ) 
   view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
   for predator in view.environment.predators:

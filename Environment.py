@@ -122,24 +122,46 @@ class Environment:
 
   # detects rectangle / circle intersection
   # returns the center of the obstacle
-  def predator_sense_obs(self, predator):
+  # def predator_sense_obs(self, predator):
+  #   for obs in self.obstacles:
+  #     for i in xrange(8, 14, 2):
+  #       pred_distance_x = abs(predator.x - obs.center[0])
+  #       pred_distance_y = abs(predator.y - obs.center[1])
+
+  #       if (pred_distance_x > (obs.width / 2 + predator.radius * i)):
+  #         break
+  #       if (pred_distance_y > (obs.height / 2 + predator.radius * i)):
+  #         break
+  #       if ( pred_distance_x <= (obs.width) / 2):
+  #         return obs.center
+  #       if ( pred_distance_y <= (obs.height) / 2):
+  #         return obs.center
+  #       corner_distance_sq = math.pow((pred_distance_x - (obs.width / 2)) , 2 ) + math.pow((pred_distance_y - (obs.height / 2)) , 2 )
+  #       if (corner_distance_sq <= math.pow(predator.radius * i , 2)):
+  #         return obs.center
+  #   return None
+
+  def animat_sense_obs(self, animat):
     for obs in self.obstacles:
       for i in xrange(8, 14, 2):
-        pred_distance_x = abs(predator.x - obs.center[0])
-        pred_distance_y = abs(predator.y - obs.center[1])
+        animat_distance_x = abs(animat.x - obs.center[0])
+        animat_distance_y = abs(animat.y - obs.center[1])
 
-        if (pred_distance_x > (obs.width / 2 + predator.radius * i)):
+        if (animat_distance_x > (obs.width / 2 + animat.radius * i)):
           break
-        if (pred_distance_y > (obs.height / 2 + predator.radius * i)):
+        if (animat_distance_y > (obs.height / 2 + animat.radius * i)):
           break
-        if ( pred_distance_x <= (obs.width) / 2):
+        if ( animat_distance_x <= (obs.width) / 2):
           return obs.center
-        if ( pred_distance_y <= (obs.height) / 2):
+        if ( animat_distance_y <= (obs.height) / 2):
           return obs.center
-        corner_distance_sq = math.pow((pred_distance_x - (obs.width / 2)) , 2 ) + math.pow((pred_distance_y - (obs.height / 2)) , 2 )
-        if (corner_distance_sq <= math.pow(predator.radius * i , 2)):
+        corner_distance_sq = math.pow((animat_distance_x - (obs.width / 2)) , 2 ) + math.pow((animat_distance_y - (obs.height / 2)) , 2 )
+        if (corner_distance_sq <= math.pow(animat.radius * i , 2)):
           return obs.center
     return None
+
+
+
 
   def predator_will_touch(self, predator):
     # check to see if the predator will touch a prey
@@ -187,7 +209,7 @@ class Environment:
     # UPDATE what the predators sense
     for pred in self.predators:
       # predator senses for obstacles nearby
-      obs_coordinate = self.predator_sense_obs(pred)
+      obs_coordinate = self.animat_sense_obs(pred)
       if (obs_coordinate is not None):
         pred.obs_direction = math.ceil(math.degrees(math.atan2(obs_coordinate[1] - pred.y, obs_coordinate[0] - pred.x)))
       # if predator senses a prey, change to hunting mode
@@ -302,7 +324,7 @@ class Environment:
       if (isinstance(pred.contact, Prey.Prey) and pred.move and pred.eat):
         pred.energy += pred.contact.energy_per_pred
       # pred dies at age 30
-      if (pred.age >= 40):
+      if (pred.age >= 35):
         pred.energy = 0
 
     # remove dead predators from the environment
@@ -328,6 +350,11 @@ class Environment:
     # TODO: modify how prey sense and update themselves with direction
     # update what the prey sense
     for prey in self.preys:
+      # predator senses for obstacles nearby
+      obs_coord = self.animat_sense_obs(prey)
+      if (obs_coord is not None):
+        prey.obs_direction = math.ceil(math.degrees(math.atan2(obs_coord[1] - prey.y, obs_coord[0] - prey.x)))
+
       # if prey senses another prey, give direction and radius of other prey as input
       prey_coord = self.prey_sense_prey(prey)
       if (prey_coord is not None):
