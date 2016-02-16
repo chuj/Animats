@@ -138,6 +138,7 @@ class Environment:
       corner_distance_sq = math.pow((pred_distance_x - (obs.width / 2)) , 2 ) + math.pow((pred_distance_y - (obs.height / 2)) , 2 )
       if (corner_distance_sq <= math.pow(predator.radius , 2)):
         return obs.center
+    return None
 
   def predator_will_touch(self, predator):
     # check to see if the predator will touch a prey
@@ -184,8 +185,12 @@ class Environment:
   def update_environment(self):
     # UPDATE what the predators sense
     for pred in self.predators:
-      prey_coordinate = self.predator_sense_prey(pred)
+      # predator senses for obstacles nearby
+      obs_coordinate = self.predator_sense_obs(pred)
+      if (obs_coordinate is not None):
+        pred.obs_direction = math.ceil(math.degrees(math.atan2(obs_coordinate[1] - pred.y, obs_coordinate[0] - pred.x)))
       # if predator senses a prey, change to hunting mode
+      prey_coordinate = self.predator_sense_prey(pred)
       if (prey_coordinate is not None):
         pred.hunting = True
         # give predator the radius of the prey
