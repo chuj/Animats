@@ -44,8 +44,8 @@ class Environment:
     # (x_top, x_bot, y_top, y_bot)
     obs_1 = Obstacle.Obstacle(250, 150, 200, 400) # vertical spanning obstacle
     self.obstacles.append(obs_1)
-    obs_2 = Obstacle.Obstacle(450 , 150, 400, 500) # horizontally spanning obstacle
-    self.obstacles.append(obs_2)
+    # obs_2 = Obstacle.Obstacle(450 , 150, 400, 500) # horizontally spanning obstacle
+    # self.obstacles.append(obs_2)
     #initialize predators
     for z in range(0, num_predator):
       location = self.findEmptySpace(Predator.Predator.radius)
@@ -85,11 +85,12 @@ class Environment:
       if ((abs(x - prey.x) < (2 * radius)) and (abs(y - prey.y) < (2 * radius))):
         return False
     # collision with obstacles
-    for obs in self.obstacles:
-      if ( ((obs.x_bot - radius) <= x <= (obs.x_top - radius)) and ((obs.y_bot - radius) <= y <= (obs.y_top - radius)) ):
-        return False
+    if (not self.collision_free_obs(x, y, radius)):
+      return False
     # the position is collision free
     return True
+  
+
 
   # function to allow predators to sense the world around them
   # through diffusion of smell
@@ -120,27 +121,6 @@ class Environment:
         continue
     return None
 
-  # detects rectangle / circle intersection
-  # returns the center of the obstacle
-  # def predator_sense_obs(self, predator):
-  #   for obs in self.obstacles:
-  #     for i in xrange(8, 14, 2):
-  #       pred_distance_x = abs(predator.x - obs.center[0])
-  #       pred_distance_y = abs(predator.y - obs.center[1])
-
-  #       if (pred_distance_x > (obs.width / 2 + predator.radius * i)):
-  #         break
-  #       if (pred_distance_y > (obs.height / 2 + predator.radius * i)):
-  #         break
-  #       if ( pred_distance_x <= (obs.width) / 2):
-  #         return obs.center
-  #       if ( pred_distance_y <= (obs.height) / 2):
-  #         return obs.center
-  #       corner_distance_sq = math.pow((pred_distance_x - (obs.width / 2)) , 2 ) + math.pow((pred_distance_y - (obs.height / 2)) , 2 )
-  #       if (corner_distance_sq <= math.pow(predator.radius * i , 2)):
-  #         return obs.center
-  #   return None
-
   def animat_sense_obs(self, animat):
     for obs in self.obstacles:
       for i in xrange(8, 14, 2):
@@ -160,7 +140,42 @@ class Environment:
           return obs.center
     return None
 
+  def animat_will_touch_obs(self, animat):
+    for obs in self.obstacles:
+      animat_distance_x = abs(animat.next_x - obs.center[0])
+      animat_distance_y = abs(animat.next_y - obs.center[1])
 
+      if (animat_distance_x > (obs.width / 2 + animat.radius)):
+        break
+      if (animat_distance_y > (obs.height / 2 + animat.radius)):
+        break
+      if ( animat_distance_x <= (obs.width) / 2):
+        return obs.center
+      if ( animat_distance_y <= (obs.height) / 2):
+        return obs.center
+      corner_distance_sq = math.pow((animat_distance_x - (obs.width / 2)) , 2 ) + math.pow((animat_distance_y - (obs.height / 2)) , 2 )
+      if (corner_distance_sq <= math.pow(animat.radius, 2)):
+        return obs.center
+    return None
+
+  def collision_free_obs(self, x, y, radius):
+    for obs in self.obstacles:
+      animat_distance_x = abs(x - obs.center[0])
+      animat_distance_y = abs(y - obs.center[1])
+      if ( (animat_distance_x > (obs.width / 2 + radius)) and (animat_distance_y > (obs.height / 2 + radius)) ):
+        break
+        # pass
+      # if (animat_distance_y > (obs.height / 2 + radius)):
+      #   break
+      #   # pass
+      if ( (animat_distance_x <= ((obs.width) / 2)) or (animat_distance_y <= ((obs.height) / 2))):
+        return False
+      # if (animat_distance_y <= ((obs.height) / 2)):
+      #   return False
+      # corner_distance_sq = math.pow((animat_distance_x - (obs.width / 2)) , 2 ) + math.pow((animat_distance_y - (obs.height / 2)) , 2 )
+      # if (corner_distance_sq <= math.pow(radius, 2)):
+      #   return False
+    return True
 
 
   def predator_will_touch(self, predator):
@@ -280,8 +295,10 @@ class Environment:
 
       # predator makes its action in the environment
       if pred.move:
-        pred.x = pred.next_x
-        pred.y = pred.next_y
+        pred_will_touch_obs = self.animat_will_touch_obs(pred)
+        if (pred_will_touch_obs is None):
+          pred.x = pred.next_x
+          pred.y = pred.next_y
       else:
         pred.next_x = pred.x
         pred.next_y = pred.y
@@ -408,8 +425,11 @@ class Environment:
         prey.next_y = prey.y
         
       if (prey.want_to_move):
-        prey.x = prey.next_x
-        prey.y = prey.next_y
+        prey_will_touch_obs = self.animat_will_touch_obs(prey)
+        if (prey_will_touch_obs is None):
+          prey.x = prey.next_x
+          prey.y = prey.next_y
+
       # prey dies at age 50
       if (prey.age >= 50):
         prey.energy = 0

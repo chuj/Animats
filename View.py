@@ -46,7 +46,8 @@ class View:
     view.surface.blit(view.background, (0,0))
     # repaint the obstacles
     view.surface.blit(view.obstacle_image_vert, (view.environment.obstacles[0].x_bot, view.environment.obstacles[0].y_top) ) 
-    view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
+    # TODO
+    # view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
     # repaint the animats
     for predator in view.environment.predators:
       view.surface.blit( pygame.transform.rotate(view.predator_image, 360 - predator.direction) , (predator.x - predator.radius, predator.y - predator.radius))
@@ -57,19 +58,20 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 20, 60)
+  view = View(800, 800, 20, 100)
   view.surface.blit(view.obstacle_image_vert, (view.environment.obstacles[0].x_bot, view.environment.obstacles[0].y_top) ) 
-  view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
+  # TODO
+  # view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
   for predator in view.environment.predators:
     view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
   for prey in view.environment.preys:
     view.surface.blit(view.prey_image, (prey.x - prey.radius, prey.y - prey.radius))
   pygame.display.flip()
-  # time.sleep(2)
+  time.sleep(20000)
   for i in range(700):
     view.update(1)
     pygame.display.flip()
-    # time.sleep(0.3)
+    time.sleep(3000)
   results = open('results', 'w')
   results.write("Iterations : %d \n" % view.environment.iterations_pred)
   print "Iterations : %d" % view.environment.iterations_pred
