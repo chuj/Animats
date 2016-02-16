@@ -120,6 +120,25 @@ class Environment:
         continue
     return None
 
+  # detects rectangle / circle intersection
+  # returns the center of the obstacle
+  def predator_sense_obs(self, predator):
+    for obs in self.obstacles:
+      pred_distance_x = abs(predator.x - obs.center[0])
+      pred_distance_y = abs(predator.y - obs.center[1])
+
+      if (pred_distance_x > (obs.width / 2 )):
+        return obs.center
+      if (pred_distance_y > (obs.height / 2 )):
+        return obs.center
+      if ( pred_distance_x <= (obs.width) / 2):
+        return obs.center
+      if ( pred_distance_y <= (obs.height) / 2):
+        return obs.center
+      corner_distance_sq = math.pow((pred_distance_x - (obs.width / 2)) , 2 ) + math.pow((pred_distance_y - (obs.height / 2)) , 2 )
+      if (corner_distance_sq <= math.pow(predator.radius , 2)):
+        return obs.center
+
   def predator_will_touch(self, predator):
     # check to see if the predator will touch a prey
     for prey in self.preys:

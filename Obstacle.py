@@ -10,3 +10,6 @@ class Obstacle:
     
     # rough center of the obstacle, used for predator and preys for sensing
     self.center = ( (x_top + x_bot) / 2.0 , ((y_top + y_bot)/2.0) )
+
+    self.width = x_top - x_bot
+    self.height = y_top - y_bot

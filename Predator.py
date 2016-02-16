@@ -2,6 +2,7 @@ from pybrain.structure import FeedForwardNetwork
 from pybrain.structure import LinearLayer, SigmoidLayer
 from pybrain.structure import FullConnection
 import Prey
+import Obstacle
 import Environment
 
 class Predator:
@@ -10,8 +11,8 @@ class Predator:
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(9)
-    hiddenLayer = SigmoidLayer(10)
+    inLayer = LinearLayer(10)
+    hiddenLayer = SigmoidLayer(11)
     outLayer = LinearLayer(4)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
@@ -43,6 +44,9 @@ class Predator:
 
     # other predator's direction. general direction to where the predator is
     self.pred_direction = 0
+
+    # general direction of sensed obstacle
+    self.obs_direction = 0
 
     # Sees prey, hunting mode
     # in hunting mode, predators can move faster, but also consumes more energy
@@ -105,7 +109,8 @@ class Predator:
                     (2000 * self.direction),
                     (2000 * self.prey_direction),
                     (2000 * self.prey_radius),
-                    (2000 * self.pred_direction)
+                    (2000 * self.pred_direction),
+                    (2000 * self.obs_direction)
                     )
 
     # Activate the nn
