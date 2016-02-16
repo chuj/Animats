@@ -44,8 +44,8 @@ class Environment:
     # (x_top, x_bot, y_top, y_bot)
     obs_1 = Obstacle.Obstacle(250, 150, 200, 400) # vertical spanning obstacle
     self.obstacles.append(obs_1)
-    # obs_2 = Obstacle.Obstacle(450 , 150, 400, 500) # horizontally spanning obstacle
-    # self.obstacles.append(obs_2)
+    obs_2 = Obstacle.Obstacle(450 , 150, 400, 500) # horizontally spanning obstacle
+    self.obstacles.append(obs_2)
     #initialize predators
     for z in range(0, num_predator):
       location = self.findEmptySpace(Predator.Predator.radius)
@@ -141,40 +141,17 @@ class Environment:
     return None
 
   def animat_will_touch_obs(self, animat):
-    for obs in self.obstacles:
-      animat_distance_x = abs(animat.next_x - obs.center[0])
-      animat_distance_y = abs(animat.next_y - obs.center[1])
-
-      if (animat_distance_x > (obs.width / 2 + animat.radius)):
-        break
-      if (animat_distance_y > (obs.height / 2 + animat.radius)):
-        break
-      if ( animat_distance_x <= (obs.width) / 2):
-        return obs.center
-      if ( animat_distance_y <= (obs.height) / 2):
-        return obs.center
-      corner_distance_sq = math.pow((animat_distance_x - (obs.width / 2)) , 2 ) + math.pow((animat_distance_y - (obs.height / 2)) , 2 )
-      if (corner_distance_sq <= math.pow(animat.radius, 2)):
-        return obs.center
+    if ( ( (self.obstacles[0].x_bot - animat.radius) < animat.next_x < (self.obstacles[0].x_top + animat.radius) ) and ( (self.obstacles[0].y_top - animat.radius) < animat.next_y < (self.obstacles[0].y_bot + animat.radius) )):
+      return self.obstacles[0].center
+    if ( ( self.obstacles[1].x_bot - animat.radius < animat.next_x < self.obstacles[1].x_top + animat.radius ) and (self.obstacles[1].y_top - animat.radius < animat.next_y < self.obstacles[1].y_bot + - animat.radius) ):
+      return self.obstacles[1].center
     return None
 
   def collision_free_obs(self, x, y, radius):
-    for obs in self.obstacles:
-      animat_distance_x = abs(x - obs.center[0])
-      animat_distance_y = abs(y - obs.center[1])
-      if ( (animat_distance_x > (obs.width / 2 + radius)) and (animat_distance_y > (obs.height / 2 + radius)) ):
-        break
-        # pass
-      # if (animat_distance_y > (obs.height / 2 + radius)):
-      #   break
-      #   # pass
-      if ( (animat_distance_x <= ((obs.width) / 2)) or (animat_distance_y <= ((obs.height) / 2))):
-        return False
-      # if (animat_distance_y <= ((obs.height) / 2)):
-      #   return False
-      # corner_distance_sq = math.pow((animat_distance_x - (obs.width / 2)) , 2 ) + math.pow((animat_distance_y - (obs.height / 2)) , 2 )
-      # if (corner_distance_sq <= math.pow(radius, 2)):
-      #   return False
+    if ( ( self.obstacles[0].x_bot - radius < x < self.obstacles[0].x_top + radius) and (self.obstacles[0].y_top - radius < y < self.obstacles[0].y_bot + radius) ):
+      return False
+    if ( ( self.obstacles[1].x_bot - radius < x < self.obstacles[1].x_top + radius) and (self.obstacles[1].y_top - radius < y < self.obstacles[1].y_bot + radius) ):
+      return False
     return True
 
 
