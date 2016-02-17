@@ -11,9 +11,9 @@ class Predator:
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(10)
-    hiddenLayer = SigmoidLayer(11)
-    outLayer = LinearLayer(4)
+    inLayer = LinearLayer(11)
+    hiddenLayer = SigmoidLayer(12)
+    outLayer = LinearLayer(5)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
     self.nn.addOutputModule(outLayer)
@@ -75,11 +75,16 @@ class Predator:
     # output thresholds for decisions
     self.move_threshold = 0
     self.eat_threshold = 0
+    self.signal_threshold = 0
+
+    # direction of signal from other predator
+    self.pred_signal_direction = 0
 
     # decisions for output
         # eating a prey gives +250 energy
     self.move = False
     self.eat = False
+    self.signal = False
 
   def update(self):
     # metabolism depends on which state the predator is in (hunting or idle)
@@ -110,7 +115,8 @@ class Predator:
                     (2000 * self.prey_direction),
                     (2000 * self.prey_radius),
                     (2000 * self.pred_direction),
-                    (2000 * self.obs_direction)
+                    (2000 * self.obs_direction),
+                    (2000 * self.pred_signal_direction)
                     )
 
     # Activate the nn
@@ -119,12 +125,22 @@ class Predator:
     # move
     if (output_vector[0] > self.move_threshold):
       self.move = True
+    else:
+      self.move = False
     # eat
     if (output_vector[1] > self.eat_threshold):
       self.eat = True
+    else:
+      self.eat = False
 
     # direction: turn right (clockwise)
     self.direction -= output_vector[2]
     #direction: turn left (counter clockwise)
     self.direction += output_vector[3]
+
+    # signal other predators
+    if (output_vector[4] > self.signal_threshold):
+      self.signal = True
+    else:
+      self.signal = False
 

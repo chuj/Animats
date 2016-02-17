@@ -197,9 +197,28 @@ class Environment:
         continue
     return None
 
+  def pred_sense_predsignal(self, pred):
+    for otherPred in self.predators:
+      if ( (abs(pred.x - otherPred.x) < (8 * pred.radius)) and (abs(pred.y - otherPred.y) < (8 * pred.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(pred.x - otherPred.x) < (10 * pred.radius)) and (abs(pred.y - otherPred.y) < (10 * pred.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(pred.x - otherPred.x) < (12 * pred.radius)) and (abs(pred.y - otherPred.y) < (12 * pred.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(pred.x - otherPred.x) < (14 * pred.radius)) and (abs(pred.y - otherPred.y) < (14 * pred.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      else:
+        continue
+    return None
+
   def update_environment(self):
     # UPDATE what the predators sense
     for pred in self.predators:
+      # predator senses for predator signals nearby
+      pred_signal_coordinate = self.pred_sense_predsignal(pred)
+      if (pred_signal_coordinate is not None):
+        signal_direction = math.ceil(math.degrees(math.atan2(pred_signal_coordinate[1] - pred.y, pred_signal_coordinate[0] - pred.x)))
+        pred.pred_signal_direction = signal_direction
       # predator senses for obstacles nearby
       obs_coordinate = self.animat_sense_obs(pred)
       if (obs_coordinate is not None):
@@ -279,6 +298,7 @@ class Environment:
       else:
         pred.next_x = pred.x
         pred.next_y = pred.y
+
 
     #TODO: modify these values when doing experiments
     # success of the attack depends on:

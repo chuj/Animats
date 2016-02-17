@@ -14,8 +14,8 @@ class Prey:
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(9)
-    hiddenLayer = SigmoidLayer(10)
+    inLayer = LinearLayer(10)
+    hiddenLayer = SigmoidLayer(11)
     outLayer = LinearLayer(4)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
@@ -85,6 +85,9 @@ class Prey:
     # energy per pred. how much energy each predator gains when eating this prey 
     self.energy_per_pred = 0
 
+    # predator signal direction
+    self.pred_signal_direction = 0
+
   def update(self):
     # metabolism depends on which state the prey is in (escaping from predator, idle)
     if (self.senses_predator is True):
@@ -118,7 +121,8 @@ class Prey:
                     (2000 * self.prey_direction),
                     (2000 * self.prey_radius),
                     (2000 * self.age),
-                    (2000 * self.obs_direction)
+                    (2000 * self.obs_direction),
+                    (2000 * self.pred_signal_direction)
                     )
 
     # Activate the nn
