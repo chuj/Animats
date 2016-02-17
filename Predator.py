@@ -119,9 +119,13 @@ class Predator:
     # move
     if (output_vector[0] > self.move_threshold):
       self.move = True
+    else:
+      self.move = False
     # eat
     if (output_vector[1] > self.eat_threshold):
       self.eat = True
+    else:
+      self.eat = False
 
     # direction: turn right (clockwise)
     self.direction -= output_vector[2]
