@@ -103,6 +103,8 @@ class Prey:
 
     if (self.energy < 100):
       self.is_hungry = True
+    else:
+      self.is_hungry = False
     
     # Aging
     self.age += 1
@@ -130,9 +132,13 @@ class Prey:
     # move
     if (output_vector[0] > self.move_threshold):
       self.want_to_move = True
+    else:
+      self.want_to_move = False
     # eat
     if (output_vector[1] > self.eat_threshold):
       self.want_to_eat = True
+    else:
+      self.want_to_eat = False
     # direction: turn right (clockwise)
     self.direction -= output_vector[2]
     #direction: turn left (counter clockwise)
