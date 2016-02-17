@@ -211,6 +211,21 @@ class Environment:
         continue
     return None
 
+  def prey_sense_predsignal(self, prey):
+    for otherPred in self.predators:
+      if ( (abs(prey.x - otherPred.x) < (8 * prey.radius)) and (abs(prey.y - otherPred.y) < (8 * prey.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(prey.x - otherPred.x) < (10 * prey.radius)) and (abs(prey.y - otherPred.y) < (10 * prey.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(prey.x - otherPred.x) < (12 * prey.radius)) and (abs(prey.y - otherPred.y) < (12 * prey.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(prey.x - otherPred.x) < (14 * prey.radius)) and (abs(prey.y - otherPred.y) < (14 * prey.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      else:
+        continue
+    return None
+
+
   def update_environment(self):
     # UPDATE what the predators sense
     for pred in self.predators:
@@ -388,6 +403,12 @@ class Environment:
     # TODO: modify how prey sense and update themselves with direction
     # update what the prey sense
     for prey in self.preys:
+      # prey senses for predator signals
+      pred_signal_coordinate = self.prey_sense_predsignal(prey)
+      if (pred_signal_coordinate is not None):
+        signal_direction = math.ceil(math.degrees(math.atan2(pred_signal_coordinate[1] - prey.y, pred_signal_coordinate[0] - prey.x)))
+        prey.pred_signal_direction = signal_direction
+
       # predator senses for obstacles nearby
       obs_coord = self.animat_sense_obs(prey)
       if (obs_coord is not None):
