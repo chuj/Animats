@@ -376,6 +376,8 @@ class Environment:
               offspring.nn.params[i] = parent1.nn.params[i]
             else:
               offspring.nn.params[i] = parent2.nn.params[i]
+          else:
+            offspring.nn.params[i] = random.uniform(-2.0, 2.0)
         # update offspring generation
         if (parent1.generation >= parent2.generation):
           offspring.generation = parent1.generation + 1
