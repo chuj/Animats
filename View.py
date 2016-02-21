@@ -51,7 +51,7 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 20, 40)
+  view = View(800, 800, 30, 60)
   for predator in view.environment.predators:
     view.surface.blit(view.predator_image, (predator.x - predator.radius, predator.y - predator.radius))
   for prey in view.environment.preys:
@@ -61,7 +61,7 @@ if __name__ == "__main__":
   for i in range(700):
     view.update(1)
     pygame.display.flip()
-    # time.sleep(0.3)
+    time.sleep(5)
   results = open('results', 'w')
   results.write("Iterations : %d \n" % view.environment.iterations_pred)
   print "Iterations : %d" % view.environment.iterations_pred
@@ -71,6 +71,15 @@ if __name__ == "__main__":
   print "Predators left : %d" % view.environment.num_predator
   results.write("Preys left : %d \n" % view.environment.num_prey)
   print "Preys left : %d" % view.environment.num_prey
+  results.write("Number of non-coop attacks : \n")
+  for x in range(len(view.environment.non_coop_atk)):
+    results.write(str(view.environment.non_coop_atk[x]))
+    results.write("\n")
+  results.write("Number of coop attacks : \n")
+  for x in range(len(view.environment.coop_atk)):
+    results.write(str(view.environment.coop_atk[x]))
+    results.write("\n")
+
   # write the surviving predator neural nets
   results.write("Predator Neural Nets : \n")
   for x in range(len(view.environment.pred_neural_nets)):
