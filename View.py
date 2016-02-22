@@ -71,7 +71,7 @@ if __name__ == "__main__":
   for prey in view.environment.preys:
     view.surface.blit(view.prey_image, (prey.x - prey.radius, prey.y - prey.radius))
   pygame.display.flip()
-  time.sleep(2)
+  # time.sleep(2)
   for i in range(700):
     view.update(1)
     pygame.display.flip()
