@@ -38,14 +38,50 @@ class Environment:
     # Number of non-cooperative attacks this iteration
     self.this_turn_non_coop_atk = 0
 
+    # Number of non-cooperative attacks this iteration that failed
+    self.this_turn_non_coop_atk_failed = 0
+
     # Number of cooperative attacks this iteration
     self.this_turn_coop_atk = 0
+
+    # Number of cooperative attacks this iteration that failed
+    self.this_turn_coop_atk_failed = 0
+
+    # Num of non-coop attacks on large prey
+    self.this_turn_non_coop_atk_large = 0
+
+    # Num of non-coop attacks on large prey that failed
+    self.this_turn_non_coop_atk_large_failed = 0
+
+    # Num of coop attacks on large prey
+    self.this_turn_coop_atk_large = 0
+
+    # Num of coop attacks on large prey that failed
+    self.this_turn_coop_atk_large_failed = 0
 
     # Array to hold number of non-cooperative attacks for each iteration
     self.non_coop_atk = []
 
+    # Array to hold number of non-cooperative attacks for each iteration that failed
+    self.non_coop_atk_failed = []
+
     # Array to hold number of cooperative attacks for each iteration
     self.coop_atk = []
+
+    # Array to hold number of cooperative attacks for each iteration that failed
+    self.coop_atk_failed = []
+
+    # Array to hold number of non-cooperative attacks for each iteration on large prey
+    self.non_coop_atk_large = []
+
+    # Array to hold number of non-cooperative attacks for each iteration on large prey that failed
+    self.non_coop_atk_large_failed = []
+
+     # Array to hold number of cooperative attacks for each iteration on large prey
+    self.coop_atk_large = []
+
+    # Array to hold number of cooperative attacks for each iteration that failed
+    self.coop_atk_large_failed = []
 
     #initialize predators
     for z in range(0, num_predator):
@@ -261,35 +297,52 @@ class Environment:
         rand_num = random.randint(1, 100)
         if (prey.radius == Prey.Prey.init_radius):
           if (prey.num_atk_pred == 1):
+            self.this_turn_non_coop_atk += 1
             # 95% chance of dying
             if (rand_num >= 95):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else:
+              self.this_turn_non_coop_atk_failed += 1
           elif (prey.num_atk_pred == 2):
+            self.this_turn_coop_atk += 2
             # 97% chance of dying
             if (rand_num >= 97):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else:
+              self.this_turn_coop_atk_failed += 2
           else:
+            self.this_turn_coop_atk += prey.num_atk_pred
             # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
         else: # a large prey is harder to kill, and injures the predator when the attack fails
           if (prey.num_atk_pred == 1):
-            # 10% chance of dying
-            if (rand_num >= 90):
+            self.this_turn_non_coop_atk_large += 1
+            self.this_turn_non_coop_atk += 1
+            # 20% chance of dying
+            if (rand_num >= 80):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
             else: # the attack failed, prey retaliates and decreases the energy of attacking predators
-              prey.energy_per_pred = (-200.0)
+              prey.energy_per_pred = (-100.0)
+              self.this_turn_non_coop_atk_large_failed += 1
+              self.this_turn_non_coop_atk_failed += 1
           elif (prey.num_atk_pred == 2):
+            self.this_turn_coop_atk_large += 2
+            self.this_turn_coop_atk += 2
             # 80% chance of dying
             if (rand_num >= 20):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
             else: # the attack failed, prey retaliates and decreases the energy of attacking predators
-              prey.energy_per_pred = (-200.0)
+              self.this_turn_coop_atk_failed += 2
+              self.this_turn_coop_atk_large_failed += 2
+              prey.energy_per_pred = (-100.0)
           else:
+            self.this_turn_coop_atk_large += prey.num_atk_pred
+            self.this_turn_coop_atk += prey.num_atk_pred
             # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
@@ -455,7 +508,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(2,3)
+      num_offspring = random.randint(1,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Prey.Prey.init_radius)
         offspring = Prey.Prey(random.random() * 359, offspring_location[0], offspring_location[1])
@@ -494,6 +547,22 @@ class Environment:
     self.non_coop_atk.append(self.this_turn_non_coop_atk)
     self.this_turn_coop_atk = 0
     self.this_turn_non_coop_atk = 0
+
+    self.coop_atk_failed.append(self.this_turn_coop_atk_failed)
+    self.non_coop_atk_failed.append(self.this_turn_non_coop_atk_failed)
+    self.this_turn_coop_atk_failed = 0
+    self.this_turn_non_coop_atk_failed = 0    
+
+    self.coop_atk_large.append(self.this_turn_coop_atk_large)
+    self.non_coop_atk_large.append(self.this_turn_non_coop_atk_large)
+    self.this_turn_coop_atk_large = 0
+    self.this_turn_non_coop_atk_large = 0
+
+    self.coop_atk_large_failed.append(self.this_turn_coop_atk_large_failed)
+    self.non_coop_atk_large_failed.append(self.this_turn_non_coop_atk_large_failed)
+    self.this_turn_coop_atk_large_failed = 0
+    self.this_turn_non_coop_atk_large_failed = 0
+
 
     # log the number of predator and prey after this iteration
     # logging.info("Num Pred:%d         Num Prey:%d" % (self.num_predator, self.num_prey))

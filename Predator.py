@@ -88,10 +88,10 @@ class Predator:
       else:
         self.energy -= 25
     else:
-      if (self.energy < 26):
+      if (self.energy < 25):
         self.energy = 0
       else:
-        self.energy -= 26
+        self.energy -= 25
 
     # Aging
     self.age += 1
