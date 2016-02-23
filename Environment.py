@@ -251,12 +251,12 @@ class Environment:
     return None
 
   def update_environment(self):
-    if (self.num_prey < 20):
-      for z in range(0, 10):    
-        location = self.findEmptySpace(Prey.Prey.init_radius)
-        new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
-        self.preys.append(new_prey)
-      self.num_prey += 10   
+    # if (self.num_prey < 20):
+    #   for z in range(0, 10):    
+    #     location = self.findEmptySpace(Prey.Prey.init_radius)
+    #     new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
+    #     self.preys.append(new_prey)
+    #   self.num_prey += 10   
 
     # UPDATE what the predators sense
     for pred in self.predators:
@@ -386,7 +386,7 @@ class Environment:
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
             else: # the attack failed, prey retaliates and decreases the energy of attacking predators
-              prey.energy_per_pred = (-100.0)
+              prey.energy_per_pred = (-400.0)
               self.this_turn_non_coop_atk_large_failed += 1
               self.this_turn_non_coop_atk_failed += 1
           elif (prey.num_atk_pred == 2):
@@ -399,7 +399,7 @@ class Environment:
             else: # the attack failed, prey retaliates and decreases the energy of attacking predators
               self.this_turn_coop_atk_failed += 2
               self.this_turn_coop_atk_large_failed += 2
-              prey.energy_per_pred = (-100.0)
+              prey.energy_per_pred = (-400.0)
           else:
             self.this_turn_coop_atk_large += prey.num_atk_pred
             self.this_turn_coop_atk += prey.num_atk_pred
