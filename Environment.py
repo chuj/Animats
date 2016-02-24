@@ -252,13 +252,15 @@ class Environment:
 
   def pred_sense_predsignal(self, pred):
     for otherPred in self.predators:
-      if ( (abs(pred.x - otherPred.x) < (8 * pred.radius)) and (abs(pred.y - otherPred.y) < (8 * pred.radius)) and (otherPred.signal is True) ):
+      if ( (abs(pred.x - otherPred.x) < (2 * pred.radius)) and (abs(pred.y - otherPred.y) < (2 * pred.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(pred.x - otherPred.x) < (4 * pred.radius)) and (abs(pred.y - otherPred.y) < (4 * pred.radius)) and (otherPred.signal is True) ):
+        return (otherPred.x, otherPred.y, otherPred.radius)
+      elif ( (abs(pred.x - otherPred.x) < (6 * pred.radius)) and (abs(pred.y - otherPred.y) < (6 * pred.radius)) and (otherPred.signal is True) ):
         return (otherPred.x, otherPred.y, otherPred.radius)
       elif ( (abs(pred.x - otherPred.x) < (10 * pred.radius)) and (abs(pred.y - otherPred.y) < (10 * pred.radius)) and (otherPred.signal is True) ):
         return (otherPred.x, otherPred.y, otherPred.radius)
       elif ( (abs(pred.x - otherPred.x) < (12 * pred.radius)) and (abs(pred.y - otherPred.y) < (12 * pred.radius)) and (otherPred.signal is True) ):
-        return (otherPred.x, otherPred.y, otherPred.radius)
-      elif ( (abs(pred.x - otherPred.x) < (14 * pred.radius)) and (abs(pred.y - otherPred.y) < (14 * pred.radius)) and (otherPred.signal is True) ):
         return (otherPred.x, otherPred.y, otherPred.radius)
       else:
         continue
@@ -266,13 +268,13 @@ class Environment:
 
   def prey_sense_predsignal(self, prey):
     for otherPred in self.predators:
-      if ( (abs(prey.x - otherPred.x) < (8 * prey.radius)) and (abs(prey.y - otherPred.y) < (8 * prey.radius)) and (otherPred.signal is True) ):
+      if ( (abs(prey.x - otherPred.x) < (2 * prey.radius)) and (abs(prey.y - otherPred.y) < (2 * prey.radius)) and (otherPred.signal is True) ):
         return (otherPred.x, otherPred.y, otherPred.radius)
-      elif ( (abs(prey.x - otherPred.x) < (10 * prey.radius)) and (abs(prey.y - otherPred.y) < (10 * prey.radius)) and (otherPred.signal is True) ):
+      elif ( (abs(prey.x - otherPred.x) < (4 * prey.radius)) and (abs(prey.y - otherPred.y) < (4 * prey.radius)) and (otherPred.signal is True) ):
         return (otherPred.x, otherPred.y, otherPred.radius)
-      elif ( (abs(prey.x - otherPred.x) < (12 * prey.radius)) and (abs(prey.y - otherPred.y) < (12 * prey.radius)) and (otherPred.signal is True) ):
+      elif ( (abs(prey.x - otherPred.x) < (6 * prey.radius)) and (abs(prey.y - otherPred.y) < (6 * prey.radius)) and (otherPred.signal is True) ):
         return (otherPred.x, otherPred.y, otherPred.radius)
-      elif ( (abs(prey.x - otherPred.x) < (14 * prey.radius)) and (abs(prey.y - otherPred.y) < (14 * prey.radius)) and (otherPred.signal is True) ):
+      elif ( (abs(prey.x - otherPred.x) < (8 * prey.radius)) and (abs(prey.y - otherPred.y) < (8 * prey.radius)) and (otherPred.signal is True) ):
         return (otherPred.x, otherPred.y, otherPred.radius)
       else:
         continue

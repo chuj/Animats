@@ -75,7 +75,7 @@ if __name__ == "__main__":
   for i in range(700):
     view.update(1)
     pygame.display.flip()
-    time.sleep(5)
+    # time.sleep(5)
   results = open('results', 'w')
   results.write("Iterations : %d \n" % view.environment.iterations_pred)
   print "Iterations : %d" % view.environment.iterations_pred
