@@ -27,7 +27,7 @@ class Predator:
     self.nn.sortModules()
     
     # Energy - dies when reaches 0
-    self.energy = 400
+    self.energy = 380
 
     # Location
     self.x = x
@@ -53,6 +53,9 @@ class Predator:
     # if not in hunting mode, then idle mode
     self.hunting = False
 
+    # tried to eat something last iteration, thus digesting now
+    self.digesting = False
+
     # where to move to next
     self.next_x = x
     self.next_y = y
@@ -75,11 +78,16 @@ class Predator:
     # output thresholds for decisions
     self.move_threshold = 0
     self.eat_threshold = 0
+    self.signal_threshold = 0
+
+    # direction of signal from other predator
+    self.pred_signal_direction = 0
 
     # decisions for output
         # eating a prey gives +250 energy
     self.move = False
     self.eat = False
+    self.signal = False
 
     # prey signal direction
     self.prey_signal_direction = 0
@@ -92,10 +100,10 @@ class Predator:
       else:
         self.energy -= 25
     else:
-      if (self.energy < 10):
+      if (self.energy < 25):
         self.energy = 0
       else:
-        self.energy -= 10
+        self.energy -= 25
 
     # Aging
     self.age += 1

@@ -46,6 +46,55 @@ class Environment:
     self.obstacles.append(obs_1)
     obs_2 = Obstacle.Obstacle(450 , 150, 400, 500) # horizontally spanning obstacle
     self.obstacles.append(obs_2)
+
+    # Number of non-cooperative attacks this iteration
+    self.this_turn_non_coop_atk = 0
+
+    # Number of non-cooperative attacks this iteration that failed
+    self.this_turn_non_coop_atk_failed = 0
+
+    # Number of cooperative attacks this iteration
+    self.this_turn_coop_atk = 0
+
+    # Number of cooperative attacks this iteration that failed
+    self.this_turn_coop_atk_failed = 0
+
+    # Num of non-coop attacks on large prey
+    self.this_turn_non_coop_atk_large = 0
+
+    # Num of non-coop attacks on large prey that failed
+    self.this_turn_non_coop_atk_large_failed = 0
+
+    # Num of coop attacks on large prey
+    self.this_turn_coop_atk_large = 0
+
+    # Num of coop attacks on large prey that failed
+    self.this_turn_coop_atk_large_failed = 0
+
+    # Array to hold number of non-cooperative attacks for each iteration
+    self.non_coop_atk = []
+
+    # Array to hold number of non-cooperative attacks for each iteration that failed
+    self.non_coop_atk_failed = []
+
+    # Array to hold number of cooperative attacks for each iteration
+    self.coop_atk = []
+
+    # Array to hold number of cooperative attacks for each iteration that failed
+    self.coop_atk_failed = []
+
+    # Array to hold number of non-cooperative attacks for each iteration on large prey
+    self.non_coop_atk_large = []
+
+    # Array to hold number of non-cooperative attacks for each iteration on large prey that failed
+    self.non_coop_atk_large_failed = []
+
+     # Array to hold number of cooperative attacks for each iteration on large prey
+    self.coop_atk_large = []
+
+    # Array to hold number of cooperative attacks for each iteration that failed
+    self.coop_atk_large_failed = []
+
     #initialize predators
     for z in range(0, num_predator):
       location = self.findEmptySpace(Predator.Predator.radius)
@@ -98,11 +147,13 @@ class Environment:
   # also returns the direction the prey is facing
   def predator_sense_prey(self, predator):
     for prey in self.preys:
-      if ( (abs(predator.x - prey.x) < (8 * predator.radius)) and (abs(predator.y - prey.y) < (8 * predator.radius)) ):
+      if ( (abs(predator.x - prey.x) < (2 * predator.radius)) and (abs(predator.y - prey.y) < (2 * predator.radius)) ):
+        return (prey.x, prey.y, prey.radius)
+      elif ( (abs(predator.x - prey.x) < (4 * predator.radius)) and (abs(predator.y - prey.y) < (4 * predator.radius)) ):
+        return (prey.x, prey.y, prey.radius)
+      elif ( (abs(predator.x - prey.x) < (6 * predator.radius)) and (abs(predator.y - prey.y) < (6 * predator.radius)) ):
         return (prey.x, prey.y, prey.radius)
       elif ( (abs(predator.x - prey.x) < (10 * predator.radius)) and (abs(predator.y - prey.y) < (10 * predator.radius)) ):
-        return (prey.x, prey.y, prey.radius)
-      elif ( (abs(predator.x - prey.x) < (12 * predator.radius)) and (abs(predator.y - prey.y) < (12 * predator.radius)) ):
         return (prey.x, prey.y, prey.radius)
       else:
         continue
@@ -111,11 +162,13 @@ class Environment:
   # TODO: modify the steps here
   def predator_sense_pred(self, predator):
     for pred in self.predators:
-      if ( (abs(predator.x - pred.x) < (8 * predator.radius)) and (abs(predator.y - pred.y) < (8 * predator.radius)) ):
+      if ( (abs(predator.x - pred.x) < (2 * predator.radius)) and (abs(predator.y - pred.y) < (2 * predator.radius)) ):
+        return (pred.x, pred.y)
+      elif ( (abs(predator.x - pred.x) < (4 * predator.radius)) and (abs(predator.y - pred.y) < (4 * predator.radius)) ):
+        return (pred.x, pred.y)
+      elif ( (abs(predator.x - pred.x) < (6 * predator.radius)) and (abs(predator.y - pred.y) < (6 * predator.radius)) ):
         return (pred.x, pred.y)
       elif ( (abs(predator.x - pred.x) < (10 * predator.radius)) and (abs(predator.y - pred.y) < (10 * predator.radius)) ):
-        return (pred.x, pred.y)
-      elif ( (abs(predator.x - pred.x) < (12 * predator.radius)) and (abs(predator.y - pred.y) < (12 * predator.radius)) ):
         return (pred.x, pred.y)
       else:
         continue
@@ -173,11 +226,11 @@ class Environment:
   # through diffusion of smell
   def prey_sense_pred(self, prey):
     for pred in self.predators:
-      if ( (abs(prey.x - pred.x) < (4 * prey.radius)) and (abs(prey.y - pred.y) < (6 * prey.radius)) ):
+      if ( (abs(prey.x - pred.x) < (2 * prey.radius)) and (abs(prey.y - pred.y) < (2 * prey.radius)) ):
         return (pred.x, pred.y)
-      elif ( (abs(prey.x - pred.x) < (6 * prey.radius)) and (abs(prey.y - pred.y) < (8 * prey.radius)) ):
+      elif ( (abs(prey.x - pred.x) < (4 * prey.radius)) and (abs(prey.y - pred.y) < (4 * prey.radius)) ):
         return (pred.x, pred.y)
-      elif ( (abs(prey.x - pred.x) < (8 * prey.radius)) and (abs(prey.y - pred.y) < (10 * prey.radius)) ):
+      elif ( (abs(prey.x - pred.x) < (6 * prey.radius)) and (abs(prey.y - pred.y) < (6 * prey.radius)) ):
         return (pred.x, pred.y)
       else:
         continue
@@ -187,11 +240,11 @@ class Environment:
   # through diffusion of smell
   def prey_sense_prey(self, prey):
     for prey_to_sense in self.preys:
-      if ( (abs(prey.x - prey_to_sense.x) < (4 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (6 * prey.radius)) ):
+      if ( (abs(prey.x - prey_to_sense.x) < (2 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (2 * prey.radius)) ):
         return (prey_to_sense.x, prey_to_sense.y, prey_to_sense.radius)
-      elif ( (abs(prey.x - prey_to_sense.x) < (6 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (8 * prey.radius)) ):
+      elif ( (abs(prey.x - prey_to_sense.x) < (4 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (4 * prey.radius)) ):
         return (prey_to_sense.x, prey_to_sense.y, prey_to_sense.radius)
-      elif ( (abs(prey.x - prey_to_sense.x) < (8 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (10 * prey.radius)) ):
+      elif ( (abs(prey.x - prey_to_sense.x) < (6 * prey.radius)) and (abs(prey.y - prey_to_sense.y) < (6 * prey.radius)) ):
         return (prey_to_sense.x, prey_to_sense.y, prey_to_sense.radius)
       else:
         continue
@@ -237,10 +290,9 @@ class Environment:
     for pred in self.predators:
       # predator senses for prey signals nearby
       prey_signal_coordinate = self.pred_sense_preysignal(pred)
-      if (pred_signal_coordinate is not None):
+      if (prey_signal_coordinate is not None):
         signal_direction = math.ceil(math.degrees(math.atan2(prey_signal_coordinate[1] - pred.y, pre_signal_coordinate[0] - pred.x)))
         pred.prey_signal_direction = signal_direction
-
       # predator senses for obstacles nearby
       obs_coordinate = self.animat_sense_obs(pred)
       if (obs_coordinate is not None):
@@ -260,7 +312,7 @@ class Environment:
             #if collision, then move to that step
             # return
         # ADJUST these values for the for loop later
-        for i in xrange(1, 3, 1):
+        for i in xrange(1, 4, 1):
           inc_x = math.cos(pred.direction) * (1 * pred.radius)
           inc_y = math.sin(pred.direction) * (1 * pred.radius)
           # make sure the pred doesn't go out of bounds
@@ -308,7 +360,7 @@ class Environment:
 
       #TODO
       # keep track of how many predators attacking that prey
-      if (isinstance(pred.contact, Prey.Prey) and pred.move and pred.eat):
+      if (isinstance(pred.contact, Prey.Prey) and pred.move and pred.eat and not pred.digesting):
         pred.contact.num_atk_pred += 1
 
       # predator makes its action in the environment
@@ -328,6 +380,7 @@ class Environment:
         pred.next_x = pred.x
         pred.next_y = pred.y
 
+
     #TODO: modify these values when doing experiments
     # success of the attack depends on:
     #       number of attacking predators
@@ -338,39 +391,55 @@ class Environment:
         rand_num = random.randint(1, 100)
         if (prey.radius == Prey.Prey.init_radius):
           if (prey.num_atk_pred == 1):
+            self.this_turn_non_coop_atk += 1
             # 95% chance of dying
             if (rand_num >= 95):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else:
+              self.this_turn_non_coop_atk_failed += 1
           elif (prey.num_atk_pred == 2):
+            self.this_turn_coop_atk += 2
             # 97% chance of dying
             if (rand_num >= 97):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+            else:
+              self.this_turn_coop_atk_failed += 2
           else:
+            self.this_turn_coop_atk += prey.num_atk_pred
             # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
         else: # a large prey is harder to kill, and injures the predator when the attack fails
           if (prey.num_atk_pred == 1):
-            # 10% chance of dying
-            if (rand_num >= 90):
+            self.this_turn_non_coop_atk_large += 1
+            self.this_turn_non_coop_atk += 1
+            # 20% chance of dying
+            if (rand_num >= 80):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
             else: # the attack failed, prey retaliates and decreases the energy of attacking predators
-              prey.energy_per_pred = (-200.0)
+              prey.energy_per_pred = (-400.0)
+              self.this_turn_non_coop_atk_large_failed += 1
+              self.this_turn_non_coop_atk_failed += 1
           elif (prey.num_atk_pred == 2):
+            self.this_turn_coop_atk_large += 2
+            self.this_turn_coop_atk += 2
             # 80% chance of dying
             if (rand_num >= 20):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
             else: # the attack failed, prey retaliates and decreases the energy of attacking predators
-              prey.energy_per_pred = (-200.0)
+              self.this_turn_coop_atk_failed += 2
+              self.this_turn_coop_atk_large_failed += 2
+              prey.energy_per_pred = (-400.0)
           else:
+            self.this_turn_coop_atk_large += prey.num_atk_pred
+            self.this_turn_coop_atk += prey.num_atk_pred
             # 100% chance of dying
             prey.energy = 0
             prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-
 
     for pred in self.predators:
       pred.current_contact = self.predator_is_touching(pred)
@@ -389,6 +458,8 @@ class Environment:
     for pred in self.predators:
       if (isinstance(pred.contact, Prey.Prey) and pred.move and pred.eat):
         pred.energy += pred.contact.energy_per_pred
+        pred.digesting = True
+      # TODO
       # pred dies at age 30
       if (pred.age >= 35):
         pred.energy = 0
@@ -416,6 +487,12 @@ class Environment:
     # TODO: modify how prey sense and update themselves with direction
     # update what the prey sense
     for prey in self.preys:
+      # prey senses for predator signals
+      pred_signal_coordinate = self.prey_sense_predsignal(prey)
+      if (pred_signal_coordinate is not None):
+        signal_direction = math.ceil(math.degrees(math.atan2(pred_signal_coordinate[1] - prey.y, pred_signal_coordinate[0] - prey.x)))
+        prey.pred_signal_direction = signal_direction
+
       # predator senses for obstacles nearby
       obs_coord = self.animat_sense_obs(prey)
       if (obs_coord is not None):
@@ -438,7 +515,7 @@ class Environment:
         # give the prey a general direction of the predator
         prey.pred_direction = math.ceil(math.degrees(math.atan2(pred_coord[1] - prey.y, pred_coord[0] - prey.x)))
         
-        for i in xrange(1, 2, 1):
+        for i in xrange(1, 3, 1):
           inc_x = math.cos(prey.direction) * (1 * prey.radius)
           inc_y = math.sin(prey.direction) * (1 * prey.radius)
           # make sure the prey doesn't go out of bounds
@@ -489,7 +566,7 @@ class Environment:
         self.mature_predators.append(pred)
 
     for prey in self.preys:
-      if (prey.age >= 15 and prey.not_mated):
+      if (prey.age >= 10 and prey.not_mated):
         self.mature_preys.append(prey)
 
     # check to see if any predators can mate
@@ -512,6 +589,8 @@ class Environment:
               offspring.nn.params[i] = parent1.nn.params[i]
             else:
               offspring.nn.params[i] = parent2.nn.params[i]
+          else:
+            offspring.nn.params[i] = random.uniform(-2.0, 2.0)
         # update offspring generation
         if (parent1.generation >= parent2.generation):
           offspring.generation = parent1.generation + 1
@@ -537,7 +616,7 @@ class Environment:
       parent1.not_mated = False
       parent2.not_mated = False
       # reproduce 2 - 4 offspring
-      num_offspring = random.randint(2,3)
+      num_offspring = random.randint(1,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Prey.Prey.init_radius)
         offspring = Prey.Prey(random.random() * 359, offspring_location[0], offspring_location[1])
@@ -570,6 +649,29 @@ class Environment:
     # save the surviving predators' neural nets
     for pred in self.predators:
       self.pred_neural_nets.append(pred.nn.params)
+
+    # save this turns number of coop and non-coop attacks into the array
+    self.coop_atk.append(self.this_turn_coop_atk)
+    self.non_coop_atk.append(self.this_turn_non_coop_atk)
+    self.this_turn_coop_atk = 0
+    self.this_turn_non_coop_atk = 0
+
+    self.coop_atk_failed.append(self.this_turn_coop_atk_failed)
+    self.non_coop_atk_failed.append(self.this_turn_non_coop_atk_failed)
+    self.this_turn_coop_atk_failed = 0
+    self.this_turn_non_coop_atk_failed = 0    
+
+    self.coop_atk_large.append(self.this_turn_coop_atk_large)
+    self.non_coop_atk_large.append(self.this_turn_non_coop_atk_large)
+    self.this_turn_coop_atk_large = 0
+    self.this_turn_non_coop_atk_large = 0
+
+    self.coop_atk_large_failed.append(self.this_turn_coop_atk_large_failed)
+    self.non_coop_atk_large_failed.append(self.this_turn_non_coop_atk_large_failed)
+    self.this_turn_coop_atk_large_failed = 0
+    self.this_turn_non_coop_atk_large_failed = 0
+
+
     # log the number of predator and prey after this iteration
     # logging.info("Num Pred:%d         Num Prey:%d" % (self.num_predator, self.num_prey))
 
