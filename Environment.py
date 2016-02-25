@@ -282,12 +282,12 @@ class Environment:
 
 
   def update_environment(self):
-    # if (self.num_prey < 20):
-    #   for z in range(0, 10):    
-    #     location = self.findEmptySpace(Prey.Prey.init_radius)
-    #     new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
-    #     self.preys.append(new_prey)
-    #   self.num_prey += 10   
+    if (self.num_prey < 20):
+      for z in range(0, 15):    
+        location = self.findEmptySpace(Prey.Prey.init_radius)
+        new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
+        self.preys.append(new_prey)
+      self.num_prey += 15   
 
     # UPDATE what the predators sense
     for pred in self.predators:
