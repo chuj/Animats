@@ -14,9 +14,9 @@ class Prey:
     #Neural network
     self.nn = FeedForwardNetwork()
     #Add layers
-    inLayer = LinearLayer(9)
-    hiddenLayer = SigmoidLayer(10)
-    outLayer = LinearLayer(4)
+    inLayer = LinearLayer(10)
+    hiddenLayer = SigmoidLayer(11)
+    outLayer = LinearLayer(5)
     self.nn.addInputModule(inLayer)
     self.nn.addModule(hiddenLayer)
     self.nn.addOutputModule(outLayer)
@@ -66,6 +66,9 @@ class Prey:
     # move or not
     self.want_to_move = False
 
+    # signal or not
+    self.signal = False
+
     # if energy is less than 100, gets hungry status
     self.is_hungry = False
 
@@ -75,6 +78,10 @@ class Prey:
     # output thresholds for decisions
     self.move_threshold = 0
     self.eat_threshold = 0
+    self.signal_threshold = 0
+
+    # direction of signal from other prey
+    self.prey_signal_direction = 0
 
     # has it mated and reproduced yet?
     self.not_mated = True
@@ -120,7 +127,8 @@ class Prey:
                     (2000 * self.prey_direction),
                     (2000 * self.prey_radius),
                     (2000 * self.age),
-                    (2000 * self.obs_direction)
+                    (2000 * self.obs_direction),
+                    (2000 * self.prey_signal_direction)
                     )
 
     # Activate the nn
@@ -139,6 +147,12 @@ class Prey:
     self.direction -= output_vector[2]
     #direction: turn left (counter clockwise)
     self.direction += output_vector[3]
+
+    # signal other preys
+    if (output_vector[4] > self.signal_threshold):
+      self.signal = True
+    else:
+      self.signal = False
 
     if (self.want_to_eat):
       if (self.energy >= 400):

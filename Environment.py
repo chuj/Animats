@@ -197,9 +197,50 @@ class Environment:
         continue
     return None
 
+  def pred_sense_preysignal(self, pred):
+    for prey in self.preys:
+      if ( (abs(pred.x - prey.x) < (2 * pred.radius)) and (abs(pred.y - prey.y) < (2 * pred.radius)) and (prey.signal is True) ):
+        return (prey.x, prey.y, prey.radius)
+      elif ( (abs(pred.x - prey.x) < (4 * pred.radius)) and (abs(pred.y - prey.y) < (4 * pred.radius)) and (prey.signal is True) ):
+        return (prey.x, prey.y, prey.radius)
+      elif ( (abs(pred.x - prey.x) < (6 * pred.radius)) and (abs(pred.y - prey.y) < (6 * pred.radius)) and (prey.signal is True) ):
+        return (prey.x, prey.y, prey.radius)
+      elif ( (abs(pred.x - prey.x) < (8 * pred.radius)) and (abs(pred.y - prey.y) < (8 * pred.radius)) and (prey.signal is True) ):
+        return (prey.x, prey.y, prey.radius)
+      else:
+        continue
+    return None
+
+  def prey_sense_preysignal(self, prey):
+    for otherPrey in self.preys:
+      if ( (abs(prey.x - otherPrey.x) < (2 * prey.radius)) and (abs(prey.y - otherPrey.y) < (2 * prey.radius)) and (otherPrey.signal is True) ):
+        return (otherPrey.x, otherPrey.y, otherPrey.radius)
+      elif ( (abs(prey.x - otherPrey.x) < (4 * prey.radius)) and (abs(prey.y - otherPrey.y) < (4 * prey.radius)) and (otherPrey.signal is True) ):
+        return (otherPrey.x, otherPrey.y, otherPrey.radius)
+      elif ( (abs(prey.x - otherPrey.x) < (6 * prey.radius)) and (abs(prey.y - otherPrey.y) < (6 * prey.radius)) and (otherPrey.signal is True) ):
+        return (otherPrey.x, otherPrey.y, otherPrey.radius)
+      elif ( (abs(prey.x - otherPrey.x) < (8 * prey.radius)) and (abs(prey.y - otherPrey.y) < (8 * prey.radius)) and (otherPrey.signal is True) ):
+        return (otherPrey.x, otherPrey.y, otherPrey.radius)
+      else:
+        continue
+    return None
+
   def update_environment(self):
+    if (self.num_prey < 20):
+      for z in range(0, 15):    
+        location = self.findEmptySpace(Prey.Prey.init_radius)
+        new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
+        self.preys.append(new_prey)
+      self.num_prey += 15   
+
     # UPDATE what the predators sense
     for pred in self.predators:
+      # predator senses for prey signals nearby
+      prey_signal_coordinate = self.pred_sense_preysignal(pred)
+      if (pred_signal_coordinate is not None):
+        signal_direction = math.ceil(math.degrees(math.atan2(prey_signal_coordinate[1] - pred.y, pre_signal_coordinate[0] - pred.x)))
+        pred.prey_signal_direction = signal_direction
+
       # predator senses for obstacles nearby
       obs_coordinate = self.animat_sense_obs(pred)
       if (obs_coordinate is not None):
@@ -274,8 +315,15 @@ class Environment:
       if pred.move:
         pred_will_touch_obs = self.animat_will_touch_obs(pred)
         if (pred_will_touch_obs is None):
-          pred.x = pred.next_x
-          pred.y = pred.next_y
+          if pred.digesting:
+            pred.next_x = pred.x
+            pred.next_y = pred.y
+          else:
+            pred.x = pred.next_x
+            pred.y = pred.next_y
+        else:
+          pred.next_x = pred.x
+          pred.next_y = pred.y  
       else:
         pred.next_x = pred.x
         pred.next_y = pred.y
