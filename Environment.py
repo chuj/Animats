@@ -95,6 +95,12 @@ class Environment:
     # Array to hold number of cooperative attacks for each iteration that failed
     self.coop_atk_large_failed = []
 
+    # how many prey coop behavior this turn
+    self.this_turn_coop_prey = 0
+
+    # array to hold number of coop prey for each iteration
+    self.coop_prey = []
+
     #initialize predators
     for z in range(0, num_predator):
       location = self.findEmptySpace(Predator.Predator.radius)
@@ -222,6 +228,13 @@ class Environment:
         return prey
     return self
 
+  def prey_is_touching(self, prey):
+    # check to see if the predator is currently touching a prey
+    for otherPrey in self.preys:
+      if ((abs(prey.x - otherPrey.x) < (2 * prey.radius)) and (abs(prey.y - otherPrey.y) < (2 * prey.radius))):
+        return otherPrey
+    return self
+
   # function to allow preys to sense predators around them
   # through diffusion of smell
   def prey_sense_pred(self, prey):
@@ -274,6 +287,8 @@ class Environment:
         return (otherPrey.x, otherPrey.y, otherPrey.radius)
       elif ( (abs(prey.x - otherPrey.x) < (8 * prey.radius)) and (abs(prey.y - otherPrey.y) < (8 * prey.radius)) and (otherPrey.signal is True) ):
         return (otherPrey.x, otherPrey.y, otherPrey.radius)
+      elif ( (abs(prey.x - otherPrey.x) < (12 * prey.radius)) and (abs(prey.y - otherPrey.y) < (8 * prey.radius)) and (otherPrey.signal is True) ):
+        return (otherPrey.x, otherPrey.y, otherPrey.radius)
       else:
         continue
     return None
@@ -291,7 +306,7 @@ class Environment:
       # predator senses for prey signals nearby
       prey_signal_coordinate = self.pred_sense_preysignal(pred)
       if (prey_signal_coordinate is not None):
-        signal_direction = math.ceil(math.degrees(math.atan2(prey_signal_coordinate[1] - pred.y, pre_signal_coordinate[0] - pred.x)))
+        signal_direction = math.ceil(math.degrees(math.atan2(prey_signal_coordinate[1] - pred.y, prey_signal_coordinate[0] - pred.x)))
         pred.prey_signal_direction = signal_direction
       # predator senses for obstacles nearby
       obs_coordinate = self.animat_sense_obs(pred)
@@ -386,60 +401,118 @@ class Environment:
     #       number of attacking predators
     #       size of the prey
     for prey in self.preys:
-      # whether atk was successful or not depends on the number of predators
-      if (prey.num_atk_pred > 0):
-        rand_num = random.randint(1, 100)
-        if (prey.radius == Prey.Prey.init_radius):
-          if (prey.num_atk_pred == 1):
-            self.this_turn_non_coop_atk += 1
-            # 95% chance of dying
-            if (rand_num >= 95):
-              prey.energy = 0
-              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+      # if the prey is in contact with a large prey, chances of surviving go way up
+      if (isinstance(prey.is_touching, Prey.Prey) and (prey.prey_radius == 25 ) ):
+        self.this_turn_coop_prey += 1
+        # whether atk was successful or not depends on the number of predators
+        if (prey.num_atk_pred > 0):
+          rand_num = random.randint(1, 100)
+          if (prey.radius == Prey.Prey.init_radius):
+            if (prey.num_atk_pred == 1):
+              self.this_turn_non_coop_atk += 1
+              # 50% chance of dying
+              if (rand_num >= 50):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else:
+                self.this_turn_non_coop_atk_failed += 1
+            elif (prey.num_atk_pred == 2):
+              self.this_turn_coop_atk += 2
+              # 70% chance of dying
+              if (rand_num >= 30):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else:
+                self.this_turn_coop_atk_failed += 2
             else:
-              self.this_turn_non_coop_atk_failed += 1
-          elif (prey.num_atk_pred == 2):
-            self.this_turn_coop_atk += 2
-            # 97% chance of dying
-            if (rand_num >= 97):
+              self.this_turn_coop_atk += prey.num_atk_pred
+              # 100% chance of dying
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+          else: # a large prey is harder to kill, and injures the predator when the attack fails
+            if (prey.num_atk_pred == 1):
+              self.this_turn_non_coop_atk_large += 1
+              self.this_turn_non_coop_atk += 1
+              # 40% chance of dying
+              if (rand_num >= 60):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+                prey.energy_per_pred = (-400.0)
+                self.this_turn_non_coop_atk_large_failed += 1
+                self.this_turn_non_coop_atk_failed += 1
+            elif (prey.num_atk_pred == 2):
+              self.this_turn_coop_atk_large += 2
+              self.this_turn_coop_atk += 2
+              # 60% chance of dying
+              if (rand_num >= 40):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+                self.this_turn_coop_atk_failed += 2
+                self.this_turn_coop_atk_large_failed += 2
+                prey.energy_per_pred = (-400.0)
             else:
-              self.this_turn_coop_atk_failed += 2
-          else:
-            self.this_turn_coop_atk += prey.num_atk_pred
-            # 100% chance of dying
-            prey.energy = 0
-            prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-        else: # a large prey is harder to kill, and injures the predator when the attack fails
-          if (prey.num_atk_pred == 1):
-            self.this_turn_non_coop_atk_large += 1
-            self.this_turn_non_coop_atk += 1
-            # 20% chance of dying
-            if (rand_num >= 80):
+              self.this_turn_coop_atk_large += prey.num_atk_pred
+              self.this_turn_coop_atk += prey.num_atk_pred
+              # 100% chance of dying
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-            else: # the attack failed, prey retaliates and decreases the energy of attacking predators
-              prey.energy_per_pred = (-400.0)
-              self.this_turn_non_coop_atk_large_failed += 1
-              self.this_turn_non_coop_atk_failed += 1
-          elif (prey.num_atk_pred == 2):
-            self.this_turn_coop_atk_large += 2
-            self.this_turn_coop_atk += 2
-            # 80% chance of dying
-            if (rand_num >= 20):
+      else:
+        # whether atk was successful or not depends on the number of predators
+        if (prey.num_atk_pred > 0):
+          rand_num = random.randint(1, 100)
+          if (prey.radius == Prey.Prey.init_radius):
+            if (prey.num_atk_pred == 1):
+              self.this_turn_non_coop_atk += 1
+              # 95% chance of dying
+              if (rand_num >= 5):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else:
+                self.this_turn_non_coop_atk_failed += 1
+            elif (prey.num_atk_pred == 2):
+              self.this_turn_coop_atk += 2
+              # 97% chance of dying
+              if (rand_num >= 3):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else:
+                self.this_turn_coop_atk_failed += 2
+            else:
+              self.this_turn_coop_atk += prey.num_atk_pred
+              # 100% chance of dying
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
-            else: # the attack failed, prey retaliates and decreases the energy of attacking predators
-              self.this_turn_coop_atk_failed += 2
-              self.this_turn_coop_atk_large_failed += 2
-              prey.energy_per_pred = (-400.0)
-          else:
-            self.this_turn_coop_atk_large += prey.num_atk_pred
-            self.this_turn_coop_atk += prey.num_atk_pred
-            # 100% chance of dying
-            prey.energy = 0
-            prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+          else: # a large prey is harder to kill, and injures the predator when the attack fails
+            if (prey.num_atk_pred == 1):
+              self.this_turn_non_coop_atk_large += 1
+              self.this_turn_non_coop_atk += 1
+              # 20% chance of dying
+              if (rand_num >= 80):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+                prey.energy_per_pred = (-400.0)
+                self.this_turn_non_coop_atk_large_failed += 1
+                self.this_turn_non_coop_atk_failed += 1
+            elif (prey.num_atk_pred == 2):
+              self.this_turn_coop_atk_large += 2
+              self.this_turn_coop_atk += 2
+              # 80% chance of dying
+              if (rand_num >= 20):
+                prey.energy = 0
+                prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
+              else: # the attack failed, prey retaliates and decreases the energy of attacking predators
+                self.this_turn_coop_atk_failed += 2
+                self.this_turn_coop_atk_large_failed += 2
+                prey.energy_per_pred = (-400.0)
+            else:
+              self.this_turn_coop_atk_large += prey.num_atk_pred
+              self.this_turn_coop_atk += prey.num_atk_pred
+              # 100% chance of dying
+              prey.energy = 0
+              prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
 
     for pred in self.predators:
       pred.current_contact = self.predator_is_touching(pred)
@@ -488,10 +561,10 @@ class Environment:
     # update what the prey sense
     for prey in self.preys:
       # prey senses for predator signals
-      pred_signal_coordinate = self.prey_sense_predsignal(prey)
-      if (pred_signal_coordinate is not None):
-        signal_direction = math.ceil(math.degrees(math.atan2(pred_signal_coordinate[1] - prey.y, pred_signal_coordinate[0] - prey.x)))
-        prey.pred_signal_direction = signal_direction
+      prey_signal_coordinate = self.prey_sense_preysignal(prey)
+      if (prey_signal_coordinate is not None):
+        signal_direction = math.ceil(math.degrees(math.atan2(prey_signal_coordinate[1] - prey.y, prey_signal_coordinate[0] - prey.x)))
+        prey.prey_signal_direction = signal_direction
 
       # predator senses for obstacles nearby
       obs_coord = self.animat_sense_obs(prey)
@@ -555,6 +628,7 @@ class Environment:
         if (prey_will_touch_obs is None):
           prey.x = prey.next_x
           prey.y = prey.next_y
+          prey.is_touching = self.prey_is_touching(prey)
 
       # prey dies at age 50
       if (prey.age >= 50):
@@ -670,6 +744,9 @@ class Environment:
     self.non_coop_atk_large_failed.append(self.this_turn_non_coop_atk_large_failed)
     self.this_turn_coop_atk_large_failed = 0
     self.this_turn_non_coop_atk_large_failed = 0
+
+    self.coop_prey.append(self.this_turn_coop_prey)
+    self.this_turn_coop_prey = 0    
 
 
     # log the number of predator and prey after this iteration

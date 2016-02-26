@@ -75,7 +75,7 @@ if __name__ == "__main__":
   for i in range(700):
     view.update(1)
     pygame.display.flip()
-    # time.sleep(5)
+    time.sleep(5)
   results = open('results', 'w')
   results.write("Iterations : %d \n" % view.environment.iterations_pred)
   print "Iterations : %d" % view.environment.iterations_pred
@@ -117,6 +117,10 @@ if __name__ == "__main__":
   # for x in range(len(view.environment.coop_atk_large_failed)):
   #   results.write(str(view.environment.coop_atk_large_failed[x]))
   #   results.write("\n")
+  results.write("Number of coop prey : \n")
+  for x in range(len(view.environment.coop_prey)):
+    results.write(str(view.environment.coop_prey[x]))
+    results.write("\n")
 
   # write the surviving predator neural nets
   results.write("Predator Neural Nets : \n")
