@@ -62,7 +62,7 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 0, 0)
+  view = View(800, 800, 20, 50)
   view.surface.blit(view.obstacle_image_vert, (view.environment.obstacles[0].x_bot, view.environment.obstacles[0].y_top) ) 
   # TODO
   view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
@@ -72,10 +72,10 @@ if __name__ == "__main__":
     view.surface.blit(view.prey_image, (prey.x - prey.radius, prey.y - prey.radius))
   pygame.display.flip()
   # time.sleep(2)
-  for i in range(700):
+  for i in range(1000):
     view.update(1)
     pygame.display.flip()
-    time.sleep(5)
+    # time.sleep(5)
   results = open('results', 'w')
   results.write("Iterations : %d \n" % view.environment.iterations_pred)
   print "Iterations : %d" % view.environment.iterations_pred
@@ -89,34 +89,34 @@ if __name__ == "__main__":
   for x in range(len(view.environment.non_coop_atk)):
     results.write(str(view.environment.non_coop_atk[x]))
     results.write("\n")
-  results.write("Number of failed non-coop attacks : \n")
-  for x in range(len(view.environment.non_coop_atk_failed)):
-    results.write(str(view.environment.non_coop_atk_failed[x]))
-    results.write("\n")
+  # results.write("Number of failed non-coop attacks : \n")
+  # for x in range(len(view.environment.non_coop_atk_failed)):
+  #   results.write(str(view.environment.non_coop_atk_failed[x]))
+  #   results.write("\n")
   results.write("Number of coop attacks : \n")
   for x in range(len(view.environment.coop_atk)):
     results.write(str(view.environment.coop_atk[x]))
     results.write("\n")
-  results.write("Number of failed coop attacks : \n")
-  for x in range(len(view.environment.coop_atk_failed)):
-    results.write(str(view.environment.coop_atk_failed[x]))
-    results.write("\n")
+  # results.write("Number of failed coop attacks : \n")
+  # for x in range(len(view.environment.coop_atk_failed)):
+  #   results.write(str(view.environment.coop_atk_failed[x]))
+  #   results.write("\n")
   results.write("Number of non-coop attacks on large : \n")
   for x in range(len(view.environment.non_coop_atk_large)):
     results.write(str(view.environment.non_coop_atk_large[x]))
     results.write("\n")
-  results.write("Number of failed non-coop attacks on large : \n")
-  for x in range(len(view.environment.non_coop_atk_large_failed)):
-    results.write(str(view.environment.non_coop_atk_large_failed[x]))
-    results.write("\n")
+  # results.write("Number of failed non-coop attacks on large : \n")
+  # for x in range(len(view.environment.non_coop_atk_large_failed)):
+  #   results.write(str(view.environment.non_coop_atk_large_failed[x]))
+  #   results.write("\n")
   results.write("Number of coop attacks on large : \n")
   for x in range(len(view.environment.coop_atk_large)):
     results.write(str(view.environment.coop_atk_large[x]))
     results.write("\n")
-  results.write("Number of failed coop attacks on large : \n")
-  for x in range(len(view.environment.coop_atk_large_failed)):
-    results.write(str(view.environment.coop_atk_large_failed[x]))
-    results.write("\n")
+  # results.write("Number of failed coop attacks on large : \n")
+  # for x in range(len(view.environment.coop_atk_large_failed)):
+  #   results.write(str(view.environment.coop_atk_large_failed[x]))
+  #   results.write("\n")
 
   # write the surviving predator neural nets
   results.write("Predator Neural Nets : \n")

@@ -251,12 +251,12 @@ class Environment:
     return None
 
   def update_environment(self):
-    # if (self.num_prey < 20):
-    #   for z in range(0, 10):    
-    #     location = self.findEmptySpace(Prey.Prey.init_radius)
-    #     new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
-    #     self.preys.append(new_prey)
-    #   self.num_prey += 10   
+    if (self.num_prey < 30):
+      for z in range(0, 15):    
+        location = self.findEmptySpace(Prey.Prey.init_radius)
+        new_prey = Prey.Prey(random.randint( 0, 359), location[0], location[1])
+        self.preys.append(new_prey)
+      self.num_prey += 15   
 
     # UPDATE what the predators sense
     for pred in self.predators:
@@ -359,7 +359,7 @@ class Environment:
           if (prey.num_atk_pred == 1):
             self.this_turn_non_coop_atk += 1
             # 95% chance of dying
-            if (rand_num >= 95):
+            if (rand_num >= 5):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
             else:
@@ -367,7 +367,7 @@ class Environment:
           elif (prey.num_atk_pred == 2):
             self.this_turn_coop_atk += 2
             # 97% chance of dying
-            if (rand_num >= 97):
+            if (rand_num >= 3):
               prey.energy = 0
               prey.energy_per_pred = prey.max_energy / prey.num_atk_pred
             else:
@@ -413,6 +413,8 @@ class Environment:
         self.preys.remove(pred.current_contact)
         # print "A predator KILLED a prey!"
         self.num_prey -= 1
+        # for reproduction
+        pred.num_prey_killed += 1
         # location = self.findEmptySpace(Prey.Prey.init_radius)
         # new_prey = Prey.Prey(random.random() * 359, location[0], location[1])
         # self.preys.append(new_prey)
@@ -531,12 +533,25 @@ class Environment:
 
     # check to see if any predators can mate
     while (len(self.mature_predators) >= 2):
+      if (self.num_predator >= 40):
+        break
       parent1 = self.mature_predators.pop(0)
       parent2 = self.mature_predators.pop(0)
       parent1.not_mated = False
       parent2.not_mated = False
-      # reproduce 2 - 4 offspring
-      num_offspring = random.randint(1 ,3)
+      # how many offspring is determined by the combined number of prey that the parents have killed
+      if ( (parent1.num_prey_killed + parent2.num_prey_killed) < 1 ):
+        num_offspring = 0
+      elif ((parent1.num_prey_killed + parent2.num_prey_killed) <= 1):
+        num_offspring = 1
+      elif ((parent1.num_prey_killed + parent2.num_prey_killed) <= 3):
+        num_offspring = 2
+      else:
+        if (self.num_predator < 10):
+          num_offspring = 15
+        else:
+          num_offspring = 10
+      # num_offspring = random.randint(1,3)
       for x in xrange(num_offspring):
         offspring_location = self.findEmptySpace(Predator.Predator.radius)
         offspring = Predator.Predator(random.random() * 359, offspring_location[0], offspring_location[1])

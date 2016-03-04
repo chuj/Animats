@@ -84,6 +84,9 @@ class Predator:
     self.move = False
     self.eat = False
 
+    # number of prey killed, used in reproduction
+    self.num_prey_killed = 0
+
   def update(self):
     # metabolism depends on which state the predator is in (hunting or idle)
     if (self.hunting is True):
