@@ -146,18 +146,36 @@ class Environment:
   # prey that are closer, thus stronger smell, are prioritized
   # also returns the direction the prey is facing
   def predator_sense_prey(self, predator):
-    for prey in self.preys:
-      if ( (abs(predator.x - prey.x) < (2 * predator.radius)) and (abs(predator.y - prey.y) < (2 * predator.radius)) ):
-        return (prey.x, prey.y, prey.radius)
-      elif ( (abs(predator.x - prey.x) < (4 * predator.radius)) and (abs(predator.y - prey.y) < (4 * predator.radius)) ):
-        return (prey.x, prey.y, prey.radius)
-      elif ( (abs(predator.x - prey.x) < (6 * predator.radius)) and (abs(predator.y - prey.y) < (6 * predator.radius)) ):
-        return (prey.x, prey.y, prey.radius)
-      elif ( (abs(predator.x - prey.x) < (10 * predator.radius)) and (abs(predator.y - prey.y) < (10 * predator.radius)) ):
-        return (prey.x, prey.y, prey.radius)
-      else:
+    prey_coordinate_data = []
+    # pred can sense up to 3 preys
+    temp_preys = self.preys
+    # for prey in temp_preys:
+    #   if (len(prey_coordinate_data) >= 3):
+    #     break
+    #   if ( (abs(predator.x - prey.x) < (2 * predator.radius)) and (abs(predator.y - prey.y) < (2 * predator.radius)) and (len(prey_coordinate_data) <= 3) ):
+    #     prey_coordinate_data.append((prey.x, prey.y, prey.radius))
+    #     continue
+    for prey in temp_preys:
+      if (len(prey_coordinate_data) >= 3):
+        break
+      if ( (abs(predator.x - prey.x) < (4 * predator.radius)) and (abs(predator.y - prey.y) < (4 * predator.radius)) ):
+        prey_coordinate_data.append((prey.x, prey.y, prey.radius))
         continue
-    return None
+    # for prey in temp_preys:
+    #   if (len(prey_coordinate_data) >= 3):
+    #     break
+    #   if ( (abs(predator.x - prey.x) < (6 * predator.radius)) and (abs(predator.y - prey.y) < (6 * predator.radius)) and (len(prey_coordinate_data) <= 3) ):
+    #     prey_coordinate_data.append((prey.x, prey.y, prey.radius))
+    #     continue
+    # for prey in temp_preys:
+    #   if (len(prey_coordinate_data) >= 3):
+    #     break
+    #   if ( (abs(predator.x - prey.x) < (10 * predator.radius)) and (abs(predator.y - prey.y) < (10 * predator.radius)) and (len(prey_coordinate_data) <= 3) ):
+    #     prey_coordinate_data.append((prey.x, prey.y, prey.radius))
+    #     continue
+    for x in xrange(3 - len(prey_coordinate_data)):
+      prey_coordinate_data.append(None)
+    return prey_coordinate_data
 
   # TODO: modify the steps here
   def predator_sense_pred(self, predator):
@@ -266,52 +284,58 @@ class Environment:
         pred.obs_direction = math.ceil(math.degrees(math.atan2(obs_coordinate[1] - pred.y, obs_coordinate[0] - pred.x)))
       # if predator senses a prey, change to hunting mode
       prey_coordinate = self.predator_sense_prey(pred)
-      if (prey_coordinate is not None):
-        pred.hunting = True
-        # give predator the radius of the prey
-        pred.prey_radius = prey_coordinate[2]
-        # give the predator a general direction of where prey is
-        pred.prey_direction = math.ceil(math.degrees(math.atan2(prey_coordinate[1] - pred.y, prey_coordinate[0] - pred.x)))
-
+      # print len(prey_coordinate)
+      for i in xrange(3):
+        if (prey_coordinate[i] is not None):
+          pred.hunting = True
+          # give predator the radius of the prey
+          pred.prey_radiuses.append(prey_coordinate[i][2])
+          # give the predator a general direction of where prey is
+          pred.prey_directions.append(math.ceil(math.degrees(math.atan2(prey_coordinate[i][1] - pred.y, prey_coordinate[i][0] - pred.x))))
+        else:
+          pred.prey_radiuses.append(0)
+          pred.prey_directions.append(0)
+      print "prey directions: \n"
+      print pred.prey_directions
         #check each pred step to see if it touches the prey
         # for loop going from steps 1 2 3
           #check each step to see if collision with prey
             #if collision, then move to that step
             # return
-        # ADJUST these values for the for loop later
-        for i in xrange(1, 4, 1):
-          inc_x = math.cos(pred.direction) * (1 * pred.radius)
-          inc_y = math.sin(pred.direction) * (1 * pred.radius)
-          # make sure the pred doesn't go out of bounds
-          if (((pred.next_x + inc_x) < 0 ) or ((pred.next_x + inc_x) > self.width )):
-            inc_x = inc_x * (-1.0)
-          if (((pred.next_y + inc_y) < 0 ) or ((pred.next_y + inc_y) > self.height )):
-            inc_y = inc_y * (-1.0)
-          pred.next_x += inc_x
-          pred.next_y += inc_y
-          pred.contact = self.predator_will_touch(pred)
-          if (isinstance(pred.contact, Prey.Prey)):
-            break
+      # ADJUST these values for the for loop later
+      for i in xrange(1, 4, 1):
+        inc_x = math.cos(pred.direction) * (1 * pred.radius)
+        inc_y = math.sin(pred.direction) * (1 * pred.radius)
+        # make sure the pred doesn't go out of bounds
+        if (((pred.next_x + inc_x) < 0 ) or ((pred.next_x + inc_x) > self.width )):
+          inc_x = inc_x * (-1.0)
+        if (((pred.next_y + inc_y) < 0 ) or ((pred.next_y + inc_y) > self.height )):
+          inc_y = inc_y * (-1.0)
+        pred.next_x += inc_x
+        pred.next_y += inc_y
+        pred.contact = self.predator_will_touch(pred)
+        if (isinstance(pred.contact, Prey.Prey)):
+          break
 
         # print "Pred energy : "
         # print pred.energy
 
-      else: # predator didn't sense any prey around it, change to idle mode
-        # print "Predator senses nothing"
-        pred.hunting = False
-        # no prey, so give a random angle
-        pred.prey_direction = random.randint(0, 359)
-        # no prey, randomly decides how much to move      
-        inc_x = math.cos(pred.direction) * ((random.randint(1, 2)) * pred.radius)
-        inc_y = math.sin(pred.direction) * ((random.randint(1, 2)) * pred.radius)
+        # else: # predator didn't sense any prey around it, change to idle mode
+        #   # print "Predator senses nothing"
+        #   pred.hunting = False
+        #   # no prey, so give a random angle
+        #   pred.prey_direction = random.randint(0, 359)
+        #   # no prey, randomly decides how much to move      
+        #   inc_x = math.cos(pred.direction) * ((random.randint(1, 2)) * pred.radius)
+        #   inc_y = math.sin(pred.direction) * ((random.randint(1, 2)) * pred.radius)
 
-        # make sure the animat doesn't go out of bounds
-        if (((pred.x + inc_x) < 0 ) or ((pred.x + inc_x) > self.width )):
-          inc_x = inc_x * (-1.0)
-        if (((pred.y + inc_y) < 0 ) or ((pred.y + inc_y) > self.height )):
-          inc_y = inc_y * (-1.0)
-        pred.next_x += inc_x
-        pred.next_y += inc_y
+        #   # make sure the animat doesn't go out of bounds
+        #   if (((pred.x + inc_x) < 0 ) or ((pred.x + inc_x) > self.width )):
+        #     inc_x = inc_x * (-1.0)
+        #   if (((pred.y + inc_y) < 0 ) or ((pred.y + inc_y) > self.height )):
+        #     inc_y = inc_y * (-1.0)
+        #   pred.next_x += inc_x
+        #   pred.next_y += inc_y
 
       # update pred.contact
       pred.contact = self.predator_will_touch(pred)
@@ -321,9 +345,12 @@ class Environment:
       if (pred_coordinate is not None):
         # if another predator is sensed, give our pred the general direction
         pred.pred_direction = math.ceil(math.degrees(math.atan2(pred_coordinate[1] - pred.y, pred_coordinate[0] - pred.x)))
-
+      # print "prey directions: \n"
+      # print pred.prey_directions
       # run predator NN with new inputs
       pred.update()
+      pred.prey_directions = []
+      pred.prey_radiuses = []
 
       #TODO
       # keep track of how many predators attacking that prey
