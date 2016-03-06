@@ -88,10 +88,10 @@ class Prey:
   def update(self):
     # metabolism depends on which state the prey is in (escaping from predator, idle)
     if (self.senses_predator is True):
-      if (self.energy < 25):
+      if (self.energy < 20):
         self.energy = 0
       else:
-        self.energy -= 25
+        self.energy -= 20
     else: # idle mode, consumes less energy
       if (self.energy < 10):
         self.energy = 0

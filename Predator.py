@@ -87,21 +87,25 @@ class Predator:
     # number of prey killed, used in reproduction
     self.num_prey_killed = 0
 
+    # reproduction counter
+    self.repro_counter = 0
+
   def update(self):
     # metabolism depends on which state the predator is in (hunting or idle)
     if (self.hunting is True):
-      if (self.energy < 25):
+      if (self.energy < 20):
         self.energy = 0
       else:
-        self.energy -= 25
+        self.energy -= 20
     else:
-      if (self.energy < 25):
+      if (self.energy < 10):
         self.energy = 0
       else:
-        self.energy -= 25
+        self.energy -= 10
 
     # Aging
     self.age += 1
+    self.repro_counter += 1
 
     # Input vector
         # input values are determined by what the animat 

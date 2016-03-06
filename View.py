@@ -62,7 +62,7 @@ class View:
 
 # main function
 if __name__ == "__main__":
-  view = View(800, 800, 20, 50)
+  view = View(800, 800, 40, 80)
   view.surface.blit(view.obstacle_image_vert, (view.environment.obstacles[0].x_bot, view.environment.obstacles[0].y_top) ) 
   # TODO
   view.surface.blit(view.obstacle_image_horz, (view.environment.obstacles[1].x_bot, view.environment.obstacles[1].y_top) ) 
@@ -72,10 +72,10 @@ if __name__ == "__main__":
     view.surface.blit(view.prey_image, (prey.x - prey.radius, prey.y - prey.radius))
   pygame.display.flip()
   # time.sleep(2)
-  for i in range(1000):
+  for i in range(700):
     view.update(1)
     pygame.display.flip()
-    # time.sleep(5)
+    # time.sleep(0.06)
   results = open('results', 'w')
   results.write("Iterations : %d \n" % view.environment.iterations_pred)
   print "Iterations : %d" % view.environment.iterations_pred
